@@ -65,6 +65,25 @@ describe("FieldRenderer", () => {
     expect(checkbox.checked).toBe(true);
   });
 
+  it("renders a date field as a plain text input with a Latvian format placeholder (not a native date picker)", () => {
+    renderField({ id: "signatureDate", label: "Datums", type: "date" });
+    const input = screen.getByLabelText("Datums") as HTMLInputElement;
+    expect(input.type).toBe("text");
+    expect(input.placeholder).toBe("DD.MM.GGGG");
+    fireEvent.change(input, { target: { value: "25.06.2026" } });
+    expect(input.value).toBe("25.06.2026");
+  });
+
+  it("opens a calendar in Latvian for the typed month when the calendar button is clicked", () => {
+    renderField({ id: "signatureDate", label: "Datums", type: "date" });
+    const input = screen.getByLabelText("Datums") as HTMLInputElement;
+    fireEvent.change(input, { target: { value: "15.03.2026" } });
+
+    fireEvent.click(screen.getByRole("button", { name: "Atvērt kalendāru" }));
+    expect(screen.getByText("2026. g. marts")).toBeInTheDocument();
+    expect(screen.getByLabelText("pirmdiena")).toBeInTheDocument();
+  });
+
   it("renders a checkbox group as individually selectable checkboxes", () => {
     renderField({
       id: "sourceOfFunds",

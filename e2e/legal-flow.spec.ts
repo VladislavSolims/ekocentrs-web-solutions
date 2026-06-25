@@ -111,13 +111,14 @@ test("legal entity client fills out the questionnaire and downloads a PDF", asyn
   await page
     .getByLabel("Personas, kura ir tiesīga pārstāvēt klientu, vārds, uzvārds", { exact: true })
     .fill("Anna Kalniņa");
-  await page.getByLabel("Datums", { exact: true }).fill("2026-06-25");
+  await page.getByLabel("Datums", { exact: true }).fill("25.06.2026");
   await page.getByRole("button", { name: "Pabeigt", exact: true }).click();
 
   // 3. Review screen -> download the PDF
   await page.getByRole("button", { name: "Lejupielādēt PDF", exact: true }).click();
   const download = await page.waitForEvent("download");
-  expect(download.suggestedFilename()).toMatch(/\.pdf$/);
+  // role=client + dealType=purchase -> the client is the buyer ("Pircejs")
+  expect(download.suggestedFilename()).toBe("Pircejs_SIA_Testa_Klients_Darzciema_iela_5,_Riga.pdf");
 
   const path = await download.path();
   const buffer = await fs.readFile(path!);

@@ -94,13 +94,14 @@ test("individual client fills out the questionnaire and downloads a PDF", async 
   // a blank handwritten signature area appears in the document instead.
   await page.getByTestId("signingMethod").getByRole("radio", { name: "Parakstīšu ar roku", exact: true }).check();
   await expect(page.getByLabel("Klienta vārds, uzvārds", { exact: true })).toHaveCount(0);
-  await page.getByLabel("Datums", { exact: true }).fill("2026-06-25");
+  await page.getByLabel("Datums", { exact: true }).fill("25.06.2026");
   await page.getByRole("button", { name: "Pabeigt", exact: true }).click();
 
   // 3. Review screen -> download the PDF
   await page.getByRole("button", { name: "Lejupielādēt PDF", exact: true }).click();
   const download = await page.waitForEvent("download");
-  expect(download.suggestedFilename()).toMatch(/\.pdf$/);
+  // role=partner + dealType=sale -> the partner is the buyer ("Pircejs")
+  expect(download.suggestedFilename()).toBe("Pircejs_Janis_Berzins_Riga,_Brivibas_iela_1.pdf");
 
   const path = await download.path();
   const buffer = await fs.readFile(path!);

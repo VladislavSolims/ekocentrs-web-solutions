@@ -1,5 +1,6 @@
 import { chromium, type Browser } from "playwright-core";
 import { renderDocumentHtml } from "@/lib/renderDocumentHtml";
+import { buildPdfFileName } from "@/lib/pdfFileName";
 import { individualSchema } from "@/schemas/individualSchema";
 import { legalSchema } from "@/schemas/legalSchema";
 import { COMPANIES, type CompanyKey } from "@/config/companies";
@@ -159,10 +160,12 @@ export async function POST(request: Request) {
       margin: { top: "20mm", bottom: "20mm", left: "15mm", right: "15mm" },
     });
 
+    const fileName = buildPdfFileName(body.answers);
+
     return new Response(new Uint8Array(pdfBuffer), {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": 'attachment; filename="anketa.pdf"',
+        "Content-Disposition": `attachment; filename="${fileName}"`,
       },
     });
   } finally {

@@ -1,7 +1,8 @@
 "use client";
 
-import { useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import type { FieldDef } from "@/schemas/types";
+import { DatePicker } from "./DatePicker";
 
 const labelClass = "block text-sm font-medium text-slate-700 mb-1";
 const inputClass =
@@ -9,13 +10,12 @@ const inputClass =
 const optionRowClass = "flex items-center gap-2 text-sm text-slate-700";
 
 export function FieldRenderer({ field }: { field: FieldDef }) {
-  const { register } = useFormContext();
+  const { register, control } = useFormContext();
 
   switch (field.type) {
     case "text":
     case "email":
     case "tel":
-    case "date":
     case "number":
       return (
         <div className="mb-4">
@@ -23,6 +23,27 @@ export function FieldRenderer({ field }: { field: FieldDef }) {
             {field.label}
           </label>
           <input id={field.id} type={field.type} className={inputClass} {...register(field.id)} />
+        </div>
+      );
+
+    case "date":
+      // A native <input type="date"> renders its calendar/format in the browser's own
+      // UI language (especially in Chrome, regardless of the page's lang="lv"), which
+      // would show e.g. Russian month names to a Latvian-language form. Our own calendar
+      // (react-day-picker, forced to the "lv" locale) keeps the picker and the typed
+      // format consistent for every client, regardless of their browser/OS language.
+      return (
+        <div className="mb-4">
+          <label htmlFor={field.id} className={labelClass}>
+            {field.label}
+          </label>
+          <Controller
+            name={field.id}
+            control={control}
+            render={({ field: { value, onChange } }) => (
+              <DatePicker id={field.id} value={typeof value === "string" ? value : ""} onChange={onChange} />
+            )}
+          />
         </div>
       );
 
