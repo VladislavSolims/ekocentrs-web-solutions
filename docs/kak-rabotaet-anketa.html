@@ -1,0 +1,619 @@
+<title>Маршрут анкеты</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+  :root {
+    --paper: #fbfcfa;
+    --surface: #f2f5f1;
+    --ink: #14201c;
+    --muted: #5c6a63;
+    --line: #dbe2dc;
+    --accent: #2f6d4f;
+    --accent-soft: #e6efe8;
+    --warn: #8a5316;
+    --warn-soft: #f7efe2;
+    --code-bg: #101a16;
+    --code-ink: #dce7de;
+    --measure: 68ch;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0e1613;
+      --surface: #16211d;
+      --ink: #e4ece5;
+      --muted: #97a79e;
+      --line: #26332d;
+      --accent: #6bb98c;
+      --accent-soft: #182a21;
+      --warn: #d9a45f;
+      --warn-soft: #241d12;
+      --code-bg: #060d0a;
+      --code-ink: #d3e0d6;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0e1613;
+    --surface: #16211d;
+    --ink: #e4ece5;
+    --muted: #97a79e;
+    --line: #26332d;
+    --accent: #6bb98c;
+    --accent-soft: #182a21;
+    --warn: #d9a45f;
+    --warn-soft: #241d12;
+    --code-bg: #060d0a;
+    --code-ink: #d3e0d6;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: clamp(1.02rem, 0.96rem + 0.28vw, 1.12rem);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 58rem;
+    margin: 0 auto;
+    padding: clamp(2rem, 1rem + 4vw, 4.5rem) clamp(1.1rem, 0.6rem + 2.4vw, 2.5rem) 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  .masthead { display: flex; flex-direction: column; gap: 1rem; }
+  .eyebrow {
+    font-size: 0.74rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  h1 {
+    font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+    font-weight: 600;
+    font-size: clamp(2rem, 1.4rem + 2.6vw, 3rem);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+    margin: 0;
+  }
+  .standfirst { max-width: var(--measure); color: var(--muted); font-size: 1.06em; margin: 0; }
+
+  section { display: flex; flex-direction: column; gap: 1rem; }
+  h2 {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-weight: 600;
+    font-size: clamp(1.3rem, 1.12rem + 0.7vw, 1.6rem);
+    line-height: 1.2;
+    text-wrap: balance;
+    margin: 0;
+  }
+  h3 { font-size: 0.95rem; font-weight: 600; margin: 0.4rem 0 0; }
+  p { margin: 0; max-width: var(--measure); }
+  a { color: var(--accent); text-underline-offset: 0.18em; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  ul, ol { margin: 0; padding-left: 1.25rem; max-width: var(--measure); display: flex; flex-direction: column; gap: 0.4rem; }
+  li::marker { color: var(--muted); }
+  code {
+    font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    font-size: 0.87em;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 0.08em 0.32em;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 6px;
+    padding: 1rem 1.2rem;
+    overflow-x: auto;
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.6;
+  }
+  pre code { background: none; border: none; padding: 0; font-size: inherit; color: inherit; }
+  .cm { color: #7f9c8b; }
+
+  figure { margin: 0.5rem 0; display: flex; flex-direction: column; gap: 0.6rem; }
+  .fig-scroll { overflow-x: auto; }
+  svg { max-width: 100%; height: auto; display: block; min-width: 30rem; }
+  figcaption { font-size: 0.86rem; color: var(--muted); max-width: var(--measure); }
+
+  /* ---------- phases ---------- */
+  .phases { display: flex; flex-direction: column; gap: 2.25rem; counter-reset: phase; }
+  .phase { display: grid; grid-template-columns: 2.4rem 1fr; gap: 0 1.05rem; align-items: start; }
+  .phase > * { grid-column: 2; }
+  .phase::before {
+    counter-increment: phase;
+    content: counter(phase);
+    grid-column: 1;
+    grid-row: 1 / span 99;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--accent);
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    display: grid;
+    place-items: center;
+    margin-top: 0.2rem;
+  }
+  .phase-body { display: flex; flex-direction: column; gap: 0.8rem; }
+  .phase h2 { font-size: clamp(1.12rem, 1.04rem + 0.4vw, 1.3rem); }
+
+  .split { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; }
+  .pane {
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    padding: 0.9rem 1.1rem;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .pane.server { background: var(--accent-soft); }
+  .pane h3 {
+    margin: 0;
+    font-size: 0.7rem;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .pane p, .pane ul { font-size: 0.93rem; max-width: none; }
+  .pane ul { padding-left: 1.1rem; }
+
+  .note {
+    border-left: 3px solid var(--warn);
+    background: var(--warn-soft);
+    padding: 0.9rem 1.1rem;
+    border-radius: 0 5px 5px 0;
+    font-size: 0.95rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .note strong { color: var(--warn); }
+  .note p { max-width: none; }
+
+  .table-scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 32rem; font-size: 0.92rem; }
+  th, td { text-align: left; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  thead th {
+    font-size: 0.68rem;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--ink);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td.file { white-space: nowrap; font-family: "IBM Plex Mono", monospace; font-size: 0.85em; }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 1.3rem;
+    color: var(--muted);
+    font-size: 0.86rem;
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="eyebrow">Как устроена работа · KYC-анкета Ekocentrs</div>
+    <h1>Маршрут анкеты: от входа агента до подписанного PDF</h1>
+    <p class="standfirst">
+      Семь шагов, которые проходит документ, и что в каждый момент делает сервер.
+      Главное, что стоит удерживать в голове: сервер участвует ровно три раза, а между
+      этими моментами всё живёт в браузере и в самой ссылке.
+    </p>
+  </header>
+
+  <section>
+    <div class="fig-scroll">
+      <figure>
+        <svg viewBox="0 0 1000 300" role="img" aria-label="Семь фаз работы с анкетой. Браузер задействован во всех семи, сервер — только в трёх: обмен токена, рендер страницы клиента и генерация PDF. Хранилище пустое на протяжении всего маршрута.">
+          <defs>
+            <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+            </marker>
+          </defs>
+
+          <!-- phase headers -->
+          <text x="196" y="26" text-anchor="middle" font-size="12" font-weight="600" fill="currentColor">Вход агента</text>
+          <text x="318" y="26" text-anchor="middle" font-size="12" font-weight="600" fill="currentColor">Ссылка</text>
+          <text x="440" y="26" text-anchor="middle" font-size="12" font-weight="600" fill="currentColor">Клиент открыл</text>
+          <text x="562" y="26" text-anchor="middle" font-size="12" font-weight="600" fill="currentColor">Заполнение</text>
+          <text x="684" y="26" text-anchor="middle" font-size="12" font-weight="600" fill="currentColor">Предпросмотр</text>
+          <text x="806" y="26" text-anchor="middle" font-size="12" font-weight="600" fill="currentColor">PDF</text>
+          <text x="928" y="26" text-anchor="middle" font-size="12" font-weight="600" fill="currentColor">Подпись</text>
+
+          <!-- lane labels -->
+          <text x="128" y="76" text-anchor="end" font-size="12" fill="currentColor" opacity="0.72">В браузере</text>
+          <text x="128" y="156" text-anchor="end" font-size="12" fill="currentColor" opacity="0.72">На сервере</text>
+          <text x="128" y="236" text-anchor="end" font-size="12" fill="currentColor" opacity="0.72">Сохранено</text>
+
+          <!-- browser lane -->
+          <rect x="140" y="52" width="112" height="40" rx="5" fill="currentColor" opacity="0.07"/>
+          <rect x="262" y="52" width="112" height="40" rx="5" fill="currentColor" opacity="0.07"/>
+          <rect x="384" y="52" width="112" height="40" rx="5" fill="currentColor" opacity="0.07"/>
+          <rect x="506" y="52" width="112" height="40" rx="5" fill="currentColor" opacity="0.07"/>
+          <rect x="628" y="52" width="112" height="40" rx="5" fill="currentColor" opacity="0.07"/>
+          <rect x="750" y="52" width="112" height="40" rx="5" fill="currentColor" opacity="0.07"/>
+          <rect x="872" y="52" width="112" height="40" rx="5" fill="currentColor" opacity="0.07"/>
+          <text x="318" y="77" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.75">данные сделки</text>
+          <text x="562" y="77" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.75">все ответы</text>
+
+          <!-- server lane: only three touches -->
+          <line x1="140" y1="152" x2="984" y2="152" stroke="currentColor" stroke-width="1" stroke-dasharray="3 5" opacity="0.28"/>
+          <rect x="140" y="132" width="112" height="40" rx="5" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>
+          <text x="196" y="148" text-anchor="middle" font-size="10.5" fill="var(--accent)">обмен</text>
+          <text x="196" y="162" text-anchor="middle" font-size="10.5" fill="var(--accent)">токена</text>
+
+          <rect x="384" y="132" width="112" height="40" rx="5" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>
+          <text x="440" y="148" text-anchor="middle" font-size="10.5" fill="var(--accent)">разбор ссылки,</text>
+          <text x="440" y="162" text-anchor="middle" font-size="10.5" fill="var(--accent)">рендер страницы</text>
+
+          <rect x="750" y="132" width="112" height="40" rx="5" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>
+          <text x="806" y="148" text-anchor="middle" font-size="10.5" fill="var(--accent)">Chromium</text>
+          <text x="806" y="162" text-anchor="middle" font-size="10.5" fill="var(--accent)">печатает PDF</text>
+
+          <!-- storage lane: empty throughout -->
+          <line x1="140" y1="232" x2="984" y2="232" stroke="currentColor" stroke-width="1" stroke-dasharray="3 5" opacity="0.28"/>
+          <text x="562" y="228" text-anchor="middle" font-size="11.5" fill="currentColor" opacity="0.6">ничего — ни файла, ни строки в базе</text>
+
+          <!-- time axis -->
+          <line x1="140" y1="272" x2="984" y2="272" stroke="currentColor" stroke-width="1" opacity="0.45" marker-end="url(#arw)"/>
+          <text x="140" y="290" font-size="11" fill="currentColor" opacity="0.6">время</text>
+        </svg>
+        <figcaption>
+          Сервер включается три раза и каждый раз ненадолго. Всё остальное время данные держит
+          браузер клиента, а между двумя людьми их переносит сама ссылка.
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="phases">
+
+    <div class="phase">
+      <div class="phase-body">
+        <h2>Агент входит</h2>
+        <p>
+          Агент открывает на ekocentrs.lv пункт меню «Анкета». Дальше происходит рукопожатие
+          между тремя сторонами, в котором пароль видит только Joomla.
+        </p>
+
+        <div class="fig-scroll">
+          <figure>
+            <svg viewBox="0 0 820 360" role="img" aria-label="Схема входа агента: браузер обращается к Joomla, Joomla проверяет сессию и группу и перенаправляет браузер на приложение с подписанным токеном, приложение проверяет подпись и ставит свою куку на восемь часов.">
+              <defs>
+                <marker id="arw2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+                </marker>
+              </defs>
+
+              <!-- actors -->
+              <rect x="20" y="16" width="180" height="38" rx="5" fill="currentColor" opacity="0.07"/>
+              <text x="110" y="40" text-anchor="middle" font-size="12" font-weight="600" fill="currentColor">Браузер агента</text>
+
+              <rect x="290" y="16" width="200" height="38" rx="5" fill="currentColor" opacity="0.07"/>
+              <text x="390" y="34" text-anchor="middle" font-size="12" font-weight="600" fill="currentColor">ekocentrs.lv</text>
+              <text x="390" y="48" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.7">Joomla + kyc-sso.php</text>
+
+              <rect x="580" y="16" width="220" height="38" rx="5" fill="currentColor" opacity="0.07"/>
+              <text x="690" y="34" text-anchor="middle" font-size="12" font-weight="600" fill="currentColor">anketa.ekocentrs.lv</text>
+              <text x="690" y="48" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.7">Next.js</text>
+
+              <!-- lifelines -->
+              <line x1="110" y1="60" x2="110" y2="336" stroke="currentColor" stroke-width="1" stroke-dasharray="3 5" opacity="0.3"/>
+              <line x1="390" y1="60" x2="390" y2="336" stroke="currentColor" stroke-width="1" stroke-dasharray="3 5" opacity="0.3"/>
+              <line x1="690" y1="60" x2="690" y2="336" stroke="currentColor" stroke-width="1" stroke-dasharray="3 5" opacity="0.3"/>
+
+              <!-- 1 -->
+              <line x1="110" y1="90" x2="382" y2="90" stroke="currentColor" stroke-width="1.4" marker-end="url(#arw2)"/>
+              <text x="246" y="83" text-anchor="middle" font-size="11" fill="currentColor">открывает пункт меню</text>
+
+              <!-- self: check -->
+              <rect x="300" y="106" width="180" height="34" rx="4" fill="currentColor" opacity="0.07"/>
+              <text x="390" y="121" text-anchor="middle" font-size="10.5" fill="currentColor">вошёл? в нужной группе?</text>
+              <text x="390" y="134" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.7">если нет — форма входа</text>
+
+              <!-- 2 -->
+              <line x1="398" y1="166" x2="682" y2="166" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#arw2)" color="var(--accent)"/>
+              <text x="540" y="159" text-anchor="middle" font-size="11" fill="var(--accent)">редирект + токен, 30 секунд</text>
+
+              <!-- self: verify -->
+              <rect x="596" y="182" width="188" height="34" rx="4" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.2"/>
+              <text x="690" y="197" text-anchor="middle" font-size="10.5" fill="var(--accent)">проверка подписи HMAC</text>
+              <text x="690" y="210" text-anchor="middle" font-size="10.5" fill="var(--accent)">и срока годности</text>
+
+              <!-- 3 -->
+              <line x1="682" y1="244" x2="118" y2="244" stroke="currentColor" stroke-width="1.4" marker-end="url(#arw2)"/>
+              <text x="400" y="237" text-anchor="middle" font-size="11" fill="currentColor">кука сессии на 8 часов + редирект на /izveidot</text>
+
+              <!-- 4 -->
+              <line x1="110" y1="290" x2="682" y2="290" stroke="currentColor" stroke-width="1.4" marker-end="url(#arw2)"/>
+              <text x="396" y="283" text-anchor="middle" font-size="11" fill="currentColor">дальнейшие заходы на /izveidot — уже с кукой</text>
+              <text x="396" y="308" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.7">Joomla больше не участвует, пока кука жива</text>
+            </svg>
+            <figcaption>
+              Пароль агента остаётся внутри Joomla. Приложение получает только подписанное
+              утверждение «это пользователь №42, и он в группе агентов», годное 30 секунд.
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="split">
+          <div class="pane">
+            <h3>Что видит человек</h3>
+            <p>Клик по пункту меню, при необходимости — обычная форма входа Joomla. Дальше сразу страница создания ссылки.</p>
+          </div>
+          <div class="pane server">
+            <h3>Что делает сервер</h3>
+            <ul>
+              <li><code>proxy.ts</code> ловит заход на <code>/izveidot</code> и проверяет куку</li>
+              <li><code>/api/auth/joomla</code> сверяет подпись токена и выдаёт сессию</li>
+              <li>протухший токен → молча обратно в Joomla, ровно один раз</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-body">
+        <h2>Агент создаёт ссылку</h2>
+        <p>
+          На <code>/izveidot</code> агент выбирает пять вещей: фирму (EKOCENTRS или SUN RAIN),
+          тип клиента (физлицо/юрлицо), роль (клиент или партнёр по сделке), адрес объекта и вид
+          сделки. Нажимает «Izveidot saiti» — получает ссылку и QR-код.
+        </p>
+
+        <div class="split">
+          <div class="pane">
+            <h3>Что видит человек</h3>
+            <p>Пять полей, кнопка, готовая ссылка с QR-кодом. Можно скопировать или отправить через «Поделиться».</p>
+          </div>
+          <div class="pane server">
+            <h3>Что делает сервер</h3>
+            <p><strong>Ничего.</strong> Ни одного запроса. Ссылка целиком собирается в браузере агента, QR-код рисуется там же.</p>
+          </div>
+        </div>
+
+        <p>
+          Выбор агента сжимается в строку и становится частью адреса — вот весь путь данных:
+        </p>
+
+        <div class="fig-scroll">
+          <figure>
+            <svg viewBox="0 0 940 190" role="img" aria-label="Путь данных сделки: выбор агента превращается в JSON, сжимается в строку, становится параметром ссылки, на сервере проверяется схемой и подставляется в форму клиента как готовые ответы.">
+              <defs>
+                <marker id="arw3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+                </marker>
+              </defs>
+
+              <rect x="14" y="42" width="150" height="62" rx="5" fill="currentColor" opacity="0.07"/>
+              <text x="89" y="66" text-anchor="middle" font-size="11.5" fill="currentColor">выбор агента</text>
+              <text x="89" y="82" text-anchor="middle" font-size="10" fill="currentColor" opacity="0.7">фирма, тип, роль,</text>
+              <text x="89" y="94" text-anchor="middle" font-size="10" fill="currentColor" opacity="0.7">адрес, вид сделки</text>
+
+              <line x1="168" y1="73" x2="216" y2="73" stroke="currentColor" stroke-width="1.4" marker-end="url(#arw3)"/>
+
+              <rect x="220" y="42" width="140" height="62" rx="5" fill="currentColor" opacity="0.07"/>
+              <text x="290" y="70" text-anchor="middle" font-size="11.5" fill="currentColor">JSON → lz-string</text>
+              <text x="290" y="87" text-anchor="middle" font-size="10" fill="currentColor" opacity="0.7">сжатие в короткую строку</text>
+
+              <line x1="364" y1="73" x2="412" y2="73" stroke="currentColor" stroke-width="1.4" marker-end="url(#arw3)"/>
+              <text x="388" y="64" text-anchor="middle" font-size="10" fill="currentColor" opacity="0.7"></text>
+
+              <rect x="416" y="42" width="180" height="62" rx="5" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>
+              <text x="506" y="66" text-anchor="middle" font-size="11.5" fill="var(--accent)">адрес ссылки</text>
+              <text x="506" y="86" text-anchor="middle" font-size="10.5" fill="var(--accent)">/aizpildit?d=…</text>
+
+              <line x1="600" y1="73" x2="648" y2="73" stroke="currentColor" stroke-width="1.4" marker-end="url(#arw3)"/>
+
+              <rect x="652" y="42" width="150" height="62" rx="5" fill="currentColor" opacity="0.07"/>
+              <text x="727" y="66" text-anchor="middle" font-size="11.5" fill="currentColor">проверка схемой</text>
+              <text x="727" y="86" text-anchor="middle" font-size="10" fill="currentColor" opacity="0.7">zod, на сервере</text>
+
+              <line x1="806" y1="73" x2="854" y2="73" stroke="currentColor" stroke-width="1.4" marker-end="url(#arw3)"/>
+
+              <rect x="858" y="42" width="68" height="62" rx="5" fill="currentColor" opacity="0.07"/>
+              <text x="892" y="68" text-anchor="middle" font-size="11" fill="currentColor">форма</text>
+              <text x="892" y="84" text-anchor="middle" font-size="10" fill="currentColor" opacity="0.7">клиента</text>
+
+              <text x="506" y="140" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">данные едут в самой ссылке — поэтому серверу нечего помнить между шагами</text>
+            </svg>
+            <figcaption>
+              Ссылка — это и есть хранилище. Пока она у клиента в мессенджере, состояние сделки
+              существует; на сервере его нет ни секунды.
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-body">
+        <h2>Клиент открывает ссылку</h2>
+        <p>
+          Клиент нажимает ссылку в WhatsApp. Никакого входа, никакого сайта агентства — сразу
+          форма. Это второй из трёх моментов, когда работает сервер.
+        </p>
+        <div class="split">
+          <div class="pane">
+            <h3>Что видит человек</h3>
+            <p>Шапка с адресом объекта и видом сделки — чтобы он сразу понял, о какой сделке речь, — и первый шаг анкеты.</p>
+          </div>
+          <div class="pane server">
+            <h3>Что делает сервер</h3>
+            <ul>
+              <li>берёт параметр <code>d</code>, распаковывает и разбирает JSON</li>
+              <li>проверяет схемой zod: пять полей и ничего лишнего</li>
+              <li>мусор или обрезанная ссылка → «Nederīga saite», а не падение</li>
+              <li>выбирает анкету: физлицо или юрлицо</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-body">
+        <h2>Клиент заполняет анкету</h2>
+        <p>
+          Дальше — шаговый визард. Анкета физлица содержит около 70 полей, юрлица — около 60,
+          но клиент видит далеко не все.
+        </p>
+        <p>
+          Работает это так: у каждого поля может быть условие <code>visibleIf</code>. Ответил
+          «не являюсь PEP» — блок вопросов о политически значимых лицах не появится. Если условиям
+          не удовлетворяет ни одно поле шага, из визарда исчезает и весь шаг: полоса прогресса
+          пересчитывается на лету, и клиент не видит «шаг 7 из 12», где половина пустая.
+        </p>
+        <div class="split">
+          <div class="pane">
+            <h3>Что видит человек</h3>
+            <p>Один экран — один блок вопросов, «Назад» и «Далее», полоса прогресса. Ответы агента (адрес, вид сделки) уже подставлены и не переспрашиваются.</p>
+          </div>
+          <div class="pane server">
+            <h3>Что делает сервер</h3>
+            <p><strong>Ничего.</strong> Ни одного запроса за всё заполнение. Ответы лежат в памяти вкладки.</p>
+          </div>
+        </div>
+        <div class="note">
+          <p><strong>Следствие, о котором стоит помнить:</strong> закрытая вкладка = потерянные ответы. Черновик негде хранить — сервер о клиенте не знает, а базы нет. Для анкеты на 15 минут это приемлемо, но если клиенты начнут жаловаться, это первый кандидат на доработку (сохранение в <code>localStorage</code> самого браузера решит без сервера).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-body">
+        <h2>Предпросмотр документа</h2>
+        <p>
+          После последнего шага визард исчезает, и на его месте собирается сам документ — тот же
+          текст и та же структура, что уйдут в PDF: заголовок по роли (клиент или партнёр по
+          сделке), реквизиты выбранной фирмы, блок «Объект сделки», все разделы с ответами и
+          сноска с юридическими определениями.
+        </p>
+        <div class="split">
+          <div class="pane">
+            <h3>Что видит человек</h3>
+            <p>Готовый документ на экране и кнопка «Lejupielādēt PDF». Есть шанс заметить опечатку до скачивания.</p>
+          </div>
+          <div class="pane server">
+            <h3>Что делает сервер</h3>
+            <p><strong>Ничего.</strong> Предпросмотр рисует браузер.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-body">
+        <h2>Генерация PDF</h2>
+        <p>
+          Третий и последний выход на сервер — и единственное место, где он делает тяжёлую работу.
+          Кнопка отправляет обычную HTML-форму методом POST на <code>/api/generate-pdf</code>
+          (не fetch — именно форму, поэтому браузер сам показывает диалог сохранения файла).
+        </p>
+        <p>Дальше по шагам:</p>
+        <ol>
+          <li>Разбирает данные формы, проверяет их форму — иначе <code>400</code>.</li>
+          <li>Собирает HTML документа, экранируя всё, что пришло от клиента.</li>
+          <li>Оборачивает в страницу с печатной вёрсткой: A4, поля 20/15 мм, запрет разрывов внутри блоков вопрос-ответ.</li>
+          <li>Запускает headless Chromium и печатает страницу в PDF.</li>
+          <li>Составляет имя файла: роль стороны, имя, адрес. Латышская диакритика транслитерируется, запрещённые в именах файлов символы вырезаются.</li>
+          <li>Отдаёт байты с заголовком <code>Content-Disposition: attachment</code> и закрывает браузер.</li>
+        </ol>
+        <div class="split">
+          <div class="pane">
+            <h3>Что видит человек</h3>
+            <p>Секунду-две ожидания и файл вида <code>Pardevejs_Janis_Berzins_Riga_Brivibas_iela_1.pdf</code> в загрузках.</p>
+          </div>
+          <div class="pane server">
+            <h3>Что делает сервер</h3>
+            <p>Поднимает Chromium, печатает, отдаёт байты, гасит Chromium. На диск ничего не пишет — PDF существует только в памяти и в ответе.</p>
+          </div>
+        </div>
+        <div class="note">
+          <p><strong>Почему Vercel предпочтительнее своего сервера:</strong> именно этот шаг требует настоящий Chromium. На Vercel подключается его облегчённая сборка, на своём сервере придётся ставить системные библиотеки вручную и держать под это память.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-body">
+        <h2>Подпись</h2>
+        <p>
+          Приложение не подписывает документ — это осознанно вынесено наружу. Если клиент выбрал
+          электронную подпись, он подписывает скачанный файл на eParaksts.lv. Если выбрал
+          подпись от руки — в документе уже оставлено пустое место под имя и подпись, и его
+          печатают.
+        </p>
+        <div class="split">
+          <div class="pane">
+            <h3>Что видит человек</h3>
+            <p>Подсказку со ссылкой на eParaksts под кнопкой скачивания.</p>
+          </div>
+          <div class="pane server">
+            <h3>Что делает сервер</h3>
+            <p><strong>Ничего.</strong> Дальнейшая судьба файла приложению неизвестна.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <section>
+    <h2>Где что лежит в коде</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Фаза</th><th>Файл</th></tr></thead>
+        <tbody>
+          <tr><td>Защита страницы агента</td><td class="file">proxy.ts</td></tr>
+          <tr><td>Обмен токена на сессию</td><td class="file">app/api/auth/joomla/route.ts</td></tr>
+          <tr><td>Проверка токена и куки</td><td class="file">lib/joomlaToken.ts, lib/session.ts</td></tr>
+          <tr><td>Создание ссылки</td><td class="file">app/izveidot/page.tsx</td></tr>
+          <tr><td>Упаковка данных в ссылку</td><td class="file">lib/linkPayload.ts</td></tr>
+          <tr><td>Разбор ссылки клиента</td><td class="file">app/aizpildit/page.tsx</td></tr>
+          <tr><td>Визард и поля</td><td class="file">components/wizard/</td></tr>
+          <tr><td>Состав анкет</td><td class="file">schemas/individualSchema.ts, legalSchema.ts</td></tr>
+          <tr><td>Сборка документа</td><td class="file">lib/renderDocumentHtml.ts</td></tr>
+          <tr><td>Генерация PDF</td><td class="file">app/api/generate-pdf/route.ts</td></tr>
+          <tr><td>Имя файла</td><td class="file">lib/pdfFileName.ts</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Что нашлось при разборе</h2>
+    <div class="note">
+      <p><strong>Обязательные поля помечены, но не проверяются.</strong> В схемах 57 полей имеют
+      <code>required: true</code> (25 у физлица, 32 у юрлица), но ни визард, ни рендер полей этот
+      флаг не читают: поля регистрируются в форме без правил валидации, а кнопка «Tālāk» просто
+      переключает шаг.</p>
+      <p>На практике это значит: клиент может прокликать «Далее» до конца, ничего не заполнив, и
+      получить пустой PDF, который формально является AML-анкетой. Для документа, который
+      требуется по 28. panta likuma, это стоит закрыть — работы примерно на один заход по TDD.</p>
+    </div>
+  </section>
+
+  <footer>
+    Ekocentrs Web Solutions · описание составлено по коду на 22.08.2026
+  </footer>
+
+</div>
