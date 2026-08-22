@@ -267,10 +267,57 @@
     flex-direction: column;
     gap: 0.4rem;
   }
+
+  /* ---------- language switcher ---------- */
+  .langbar {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    gap: 0.35rem;
+    justify-content: flex-end;
+    padding: 0.55rem clamp(1.1rem, 0.6rem + 2.4vw, 2.5rem);
+  }
+  .langbar button {
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--muted);
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    padding: 0.25rem 0.8rem;
+    cursor: pointer;
+  }
+  .langbar button:hover { color: var(--ink); }
+  .langbar button[aria-pressed="true"] {
+    color: var(--accent);
+    border-color: var(--line);
+    background: var(--accent-soft);
+  }
+  .langbar button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .doc { display: none; flex-direction: column; gap: 3.25rem; }
+  .wrap[data-lang="lv"] .doc[lang="lv"],
+  .wrap[data-lang="ru"] .doc[lang="ru"],
+  .wrap[data-lang="en"] .doc[lang="en"] { display: flex; }
+
+  @media print {
+    .langbar { display: none; }
+  }
 </style>
 
-<div class="wrap">
+<nav class="langbar" aria-label="Valoda / Язык / Language">
+  <button type="button" data-set-lang="lv" aria-pressed="true">Latviski</button>
+  <button type="button" data-set-lang="ru" aria-pressed="false">Русский</button>
+  <button type="button" data-set-lang="en" aria-pressed="false">English</button>
+</nav>
 
+<div class="wrap" data-lang="lv">
+
+<div class="doc" lang="lv">
   <header class="masthead">
     <div class="eyebrow">Tehniskā specifikācija · nodošana vietnes uzturētājam</div>
     <h1>Anketas integrācija ekocentrs.lv vietnē</h1>
@@ -305,9 +352,9 @@
 
     <div class="fig-scroll">
       <figure>
-        <svg viewBox="0 0 820 260" role="img" aria-label="Divas lapas: /izveidot ir aģentu lapa, kurai jābūt slēgtai; /aizpildit ir klienta anketa, kurai jāpaliek publiskai. Ierobežojums jāliek tikai uz /izveidot, nevis uz visu subdomain.">
+        <svg viewBox="0 0 820 268" role="img" aria-label="Divas lapas: /izveidot ir aģentu lapa, kurai jābūt slēgtai; /aizpildit ir klienta anketa, kurai jāpaliek publiskai. Ierobežojums jāliek tikai uz /izveidot, nevis uz visu subdomain.">
           <defs>
-            <marker id="hx" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <marker id="hx-lv" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
               <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
             </marker>
           </defs>
@@ -328,13 +375,13 @@
           <text x="456" y="117" font-size="11.5" fill="currentColor" opacity="0.8">Jāpaliek publiskai.</text>
 
           <!-- actors -->
-          <text x="204" y="176" text-anchor="middle" font-size="11.5" fill="currentColor" opacity="0.75">tikai aģenti</text>
-          <line x1="204" y1="190" x2="204" y2="146" stroke="var(--accent)" stroke-width="1.4" marker-end="url(#hx)"/>
+          <line x1="204" y1="180" x2="204" y2="146" stroke="var(--accent)" stroke-width="1.4" marker-end="url(#hx-lv)"/>
+          <text x="204" y="200" text-anchor="middle" font-size="11.5" fill="currentColor" opacity="0.75">tikai aģenti</text>
 
-          <text x="616" y="176" text-anchor="middle" font-size="11.5" fill="currentColor" opacity="0.75">jebkurš klients ar saiti</text>
-          <line x1="616" y1="190" x2="616" y2="146" stroke="currentColor" stroke-width="1.4" marker-end="url(#hx)"/>
+          <line x1="616" y1="180" x2="616" y2="146" stroke="currentColor" stroke-width="1.4" marker-end="url(#hx-lv)"/>
+          <text x="616" y="200" text-anchor="middle" font-size="11.5" fill="currentColor" opacity="0.75">jebkurš klients ar saiti</text>
 
-          <text x="410" y="228" text-anchor="middle" font-size="12" fill="currentColor">
+          <text x="410" y="240" text-anchor="middle" font-size="12" fill="currentColor">
             Ierobežojums jāliek uz ceļu /izveidot, nevis uz visu subdomain.
           </text>
         </svg>
@@ -501,5 +548,499 @@ Piekļuves līmenis: Special (vai jūsu aģentu līmenis)</code></pre>
   <footer>
     <div>Ekocentrs Web Solutions · AML/KYC anketa</div>
   </footer>
+</div>
+
+<div class="doc" lang="ru">
+  <header class="masthead">
+    <div class="eyebrow">Техническая спецификация · для администратора сайта</div>
+    <h1>Подключение анкеты к сайту ekocentrs.lv</h1>
+    <p class="standfirst">
+      AML/KYC анкета идентификации клиента — это самостоятельное приложение на Next.js.
+      Оно не устанавливается внутрь Joomla и не требует изменений в коде сайта: работает на
+      своём поддомене, а с сайта на него ведёт обычная ссылка.
+    </p>
+    <dl class="facts">
+      <div class="fact"><dt>Сайт</dt><dd>Joomla 3.10.10</dd></div>
+      <div class="fact"><dt>Приложение</dt><dd>Next.js 16 / Node</dd></div>
+      <div class="fact"><dt>Поддомен</dt><dd>anketa.ekocentrs.lv</dd></div>
+      <div class="fact"><dt>Правок в коде Joomla</dt><dd>нет</dd></div>
+    </dl>
+  </header>
+
+  <section class="summary">
+    <h2>Коротко</h2>
+    <ol>
+      <li>Приложение размещается на <code>anketa.ekocentrs.lv</code> (Vercel или ваш сервер).</li>
+      <li>В меню Joomla появляется ссылка на него.</li>
+      <li>Одну страницу — <code>/izveidot</code> — нужно закрыть от посторонних так, как вам удобнее. Остальное остаётся публичным.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Две страницы с противоположными требованиями</h2>
+    <p>
+      Это единственное место, где легко ошибиться, поэтому оно в самом начале.
+      В приложении две страницы, и им нужно прямо противоположное.
+    </p>
+
+    <div class="fig-scroll">
+      <figure>
+        <svg viewBox="0 0 820 268" role="img" aria-label="Две страницы: /izveidot — страница агентов, её нужно закрыть; /aizpildit — анкета клиента, она должна остаться публичной. Ограничение вешается только на путь /izveidot, а не на весь поддомен.">
+          <defs>
+            <marker id="hx-ru" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+            </marker>
+          </defs>
+
+          <text x="24" y="30" font-size="12" font-weight="600" fill="currentColor">anketa.ekocentrs.lv</text>
+
+          <rect x="24" y="52" width="360" height="86" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"/>
+          <text x="44" y="78" font-size="13" font-weight="600" fill="var(--accent)">/izveidot</text>
+          <text x="44" y="99" font-size="11.5" fill="var(--accent)">Страница агентов — создание ссылок.</text>
+          <text x="44" y="117" font-size="11.5" fill="var(--accent)">Должна быть закрыта.</text>
+
+          <rect x="436" y="52" width="360" height="86" rx="6" fill="currentColor" opacity="0.07"/>
+          <rect x="436" y="52" width="360" height="86" rx="6" fill="none" stroke="currentColor" stroke-width="1" opacity="0.35"/>
+          <text x="456" y="78" font-size="13" font-weight="600" fill="currentColor">/aizpildit?d=…</text>
+          <text x="456" y="99" font-size="11.5" fill="currentColor" opacity="0.8">Анкета клиента, открывается по ссылке.</text>
+          <text x="456" y="117" font-size="11.5" fill="currentColor" opacity="0.8">Должна остаться публичной.</text>
+
+          <line x1="204" y1="180" x2="204" y2="146" stroke="var(--accent)" stroke-width="1.4" marker-end="url(#hx-ru)"/>
+          <text x="204" y="200" text-anchor="middle" font-size="11.5" fill="currentColor" opacity="0.75">только агенты</text>
+
+          <line x1="616" y1="180" x2="616" y2="146" stroke="currentColor" stroke-width="1.4" marker-end="url(#hx-ru)"/>
+          <text x="616" y="200" text-anchor="middle" font-size="11.5" fill="currentColor" opacity="0.75">любой клиент со ссылкой</text>
+
+          <text x="410" y="240" text-anchor="middle" font-size="12" fill="currentColor">
+            Ограничение вешается на путь /izveidot, а не на весь поддомен.
+          </text>
+        </svg>
+        <figcaption>
+          Если защиту поставить на весь поддомен, клиенты больше не смогут заполнить анкету —
+          учётных записей у них нет и не будет.
+        </figcaption>
+      </figure>
+    </div>
+
+    <div class="note">
+      <p><strong>У клиента нет и не будет учётной записи.</strong> Агент создаёт ссылку и
+      отправляет её клиенту, например через WhatsApp. Все данные сделки закодированы в самой
+      ссылке, поэтому она должна открываться сразу, без входа.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Кто что делает</h2>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Задача</th><th>Исполнитель</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Приложение, генерация PDF, создание ссылок</td><td class="who">Мы — готово</td></tr>
+          <tr><td>Размещение приложения и TLS-сертификат</td><td class="who">Мы или вы — см. шаг 1</td></tr>
+          <tr><td>DNS-запись для поддомена</td><td class="who">Вы</td></tr>
+          <tr><td>Пункт меню на сайте</td><td class="who">Вы</td></tr>
+          <tr><td>Ограничение доступа к <code>/izveidot</code></td><td class="who">Вы</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Шаги внедрения</h2>
+
+    <div class="steps">
+
+      <div class="stepblock">
+        <div class="stepbody">
+          <h2>Размещение приложения</h2>
+          <p>Два варианта — выберите тот, что вам удобнее; нас устраивают оба.</p>
+          <h3>A. Vercel (бесплатно, быстрее всего)</h3>
+          <p>Размещаем мы, с вашей стороны остаётся только DNS-запись из шага 2.</p>
+          <h3>B. Ваш сервер</h3>
+          <p>
+            Нужен Node.js 20+ и reverse proxy. Исходный код пришлём, как только вы скажете,
+            что выбираете этот вариант, — либо доступ к приватному Git-репозиторию, либо
+            архивом, как вам удобнее. Приложение слушает порт 3000:
+          </p>
+          <pre><code>npm ci
+npm run build
+npm start          <span class="cm"># порт 3000</span></code></pre>
+          <p>Пример блока nginx:</p>
+          <pre><code>server {
+    server_name anketa.ekocentrs.lv;
+    location / {
+        proxy_pass         http://127.0.0.1:3000;
+        proxy_set_header   Host $host;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+    }
+}</code></pre>
+          <div class="note">
+            <p><strong>Важно:</strong> для генерации PDF приложение запускает headless Chromium.
+            На своём сервере для этого нужны системные библиотеки (<code>libnss3</code>,
+            <code>libatk-bridge2.0-0</code>, <code>libdrm2</code>, <code>libgbm1</code>,
+            <code>libasound2</code>) и около 1&nbsp;ГБ свободной памяти. На Vercel это работает
+            без дополнительных действий — поэтому рекомендуем вариант A.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="stepblock">
+        <div class="stepbody">
+          <h2>DNS-запись</h2>
+          <p>Добавьте поддомен <code>anketa.ekocentrs.lv</code>:</p>
+          <pre><code><span class="cm"># Вариант A — Vercel</span>
+anketa   CNAME   cname.vercel-dns.com.
+
+<span class="cm"># Вариант B — ваш сервер</span>
+anketa   A       &lt;IP сервера&gt;</code></pre>
+          <p>TLS-сертификат обязателен.</p>
+        </div>
+      </div>
+
+      <div class="stepblock">
+        <div class="stepbody">
+          <h2>Ссылка в меню Joomla</h2>
+          <p>
+            Админка Joomla → <em>Меню → Новый элемент</em> → тип <em>Внешний URL</em>:
+          </p>
+          <pre><code>URL:            https://anketa.ekocentrs.lv/izveidot
+Уровень доступа: Special (или ваш уровень для агентов)</code></pre>
+          <p>
+            Уровень доступа лишь прячет ссылку от остальных посетителей сайта — настоящее
+            ограничение ставится в шаге 4.
+          </p>
+          <div class="note">
+            <p><strong>Без iframe.</strong> Страницу агентов не стоит встраивать в статью через
+            <code>&lt;iframe&gt;</code>: часть браузеров блокирует сторонние cookie, и страница
+            будет вести себя непредсказуемо. Для анкеты клиента iframe тоже не подходит — все
+            данные сделки лежат в параметре ссылки, а внутрь iframe они не попадают.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="stepblock">
+        <div class="stepbody">
+          <h2>Ограничение доступа к <code>/izveidot</code></h2>
+          <p>
+            Это мы оставляем на ваше усмотрение — вы лучше знаете, что уже работает в вашей
+            инфраструктуре. На стороне приложения настраивать ничего не нужно: оно готово
+            работать за любым внешним ограничением и само входа не требует.
+          </p>
+          <p>Три распространённых варианта, если пригодятся:</p>
+          <ul>
+            <li><strong>Cloudflare Access</strong> — бесплатно до 50 пользователей, вход через
+              Google-аккаунт, ограничение можно повесить на конкретный путь.</li>
+            <li><strong>Список IP-адресов</strong> офиса — самое простое, но агент не сможет
+              работать из дома или с телефона.</li>
+            <li><strong>HTTP Basic Auth</strong> на <code>location /izveidot</code> — один пароль
+              на всех агентов, ставится в конфиге nginx в две строки.</li>
+          </ul>
+          <p>
+            Если вам удобнее что-то другое — делайте так, как считаете правильным. Единственное
+            условие — то, что описано в начале страницы: ограничение касается только
+            <code>/izveidot</code>, а <code>/aizpildit</code> остаётся публичным.
+          </p>
+        </div>
+      </div>
+
+      <div class="stepblock">
+        <div class="stepbody">
+          <h2>Проверка</h2>
+          <ul>
+            <li>Агент из офиса открывает ссылку в меню → попадает на страницу создания ссылок.</li>
+            <li>Посторонний открывает <code>anketa.ekocentrs.lv/izveidot</code> → не попадает внутрь.</li>
+            <li>Ссылка клиента <code>/aizpildit?d=…</code> открывается анонимно — в другом браузере,
+              на телефоне, без VPN и без учётной записи.</li>
+            <li>Клиент заполняет анкету до конца и скачивает PDF.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Когда закончите</h2>
+    <p>Нам достаточно двух вещей:</p>
+    <ul>
+      <li>подтверждение, что <code>anketa.ekocentrs.lv</code> создан и указывает куда нужно;</li>
+      <li>короткое описание, чем именно защищён <code>/izveidot</code> — чтобы мы знали, что
+        сказать агенту, когда он в первый раз попробует зайти.</li>
+    </ul>
+    <p>
+      Если возникнут вопросы или что-то в вашей инфраструктуре требует другого подхода —
+      напишите, подстроимся.
+    </p>
+  </section>
+
+  <footer>
+    <div>Ekocentrs Web Solutions · AML/KYC анкета</div>
+  </footer>
+</div>
+
+<div class="doc" lang="en">
+  <header class="masthead">
+    <div class="eyebrow">Technical specification · for the site maintainer</div>
+    <h1>Connecting the questionnaire to ekocentrs.lv</h1>
+    <p class="standfirst">
+      The AML/KYC client identification questionnaire is a standalone Next.js application.
+      It is not installed inside Joomla and needs no changes to the site's code: it runs on its
+      own subdomain, and an ordinary link leads to it from the site.
+    </p>
+    <dl class="facts">
+      <div class="fact"><dt>Site</dt><dd>Joomla 3.10.10</dd></div>
+      <div class="fact"><dt>Application</dt><dd>Next.js 16 / Node</dd></div>
+      <div class="fact"><dt>Subdomain</dt><dd>anketa.ekocentrs.lv</dd></div>
+      <div class="fact"><dt>Changes to Joomla code</dt><dd>none</dd></div>
+    </dl>
+  </header>
+
+  <section class="summary">
+    <h2>In short</h2>
+    <ol>
+      <li>The application is deployed to <code>anketa.ekocentrs.lv</code> (Vercel or your server).</li>
+      <li>A link to it appears in the Joomla menu.</li>
+      <li>One page — <code>/izveidot</code> — needs to be closed off, however suits you best. Everything else stays public.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Two pages with opposite requirements</h2>
+    <p>
+      This is the one place that is easy to get wrong, which is why it comes first.
+      The application has two pages, and they need the exact opposite of each other.
+    </p>
+
+    <div class="fig-scroll">
+      <figure>
+        <svg viewBox="0 0 820 268" role="img" aria-label="Two pages: /izveidot is the agent page and must be closed; /aizpildit is the client questionnaire and must stay public. The restriction goes on the /izveidot path, not on the whole subdomain.">
+          <defs>
+            <marker id="hx-en" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+            </marker>
+          </defs>
+
+          <text x="24" y="30" font-size="12" font-weight="600" fill="currentColor">anketa.ekocentrs.lv</text>
+
+          <rect x="24" y="52" width="360" height="86" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"/>
+          <text x="44" y="78" font-size="13" font-weight="600" fill="var(--accent)">/izveidot</text>
+          <text x="44" y="99" font-size="11.5" fill="var(--accent)">Agent page — creates links.</text>
+          <text x="44" y="117" font-size="11.5" fill="var(--accent)">Must be closed.</text>
+
+          <rect x="436" y="52" width="360" height="86" rx="6" fill="currentColor" opacity="0.07"/>
+          <rect x="436" y="52" width="360" height="86" rx="6" fill="none" stroke="currentColor" stroke-width="1" opacity="0.35"/>
+          <text x="456" y="78" font-size="13" font-weight="600" fill="currentColor">/aizpildit?d=…</text>
+          <text x="456" y="99" font-size="11.5" fill="currentColor" opacity="0.8">Client questionnaire, opened from a link.</text>
+          <text x="456" y="117" font-size="11.5" fill="currentColor" opacity="0.8">Must stay public.</text>
+
+          <line x1="204" y1="180" x2="204" y2="146" stroke="var(--accent)" stroke-width="1.4" marker-end="url(#hx-en)"/>
+          <text x="204" y="200" text-anchor="middle" font-size="11.5" fill="currentColor" opacity="0.75">agents only</text>
+
+          <line x1="616" y1="180" x2="616" y2="146" stroke="currentColor" stroke-width="1.4" marker-end="url(#hx-en)"/>
+          <text x="616" y="200" text-anchor="middle" font-size="11.5" fill="currentColor" opacity="0.75">any client with the link</text>
+
+          <text x="410" y="240" text-anchor="middle" font-size="12" fill="currentColor">
+            The restriction goes on the /izveidot path, not the whole subdomain.
+          </text>
+        </svg>
+        <figcaption>
+          If the protection is applied to the whole subdomain, clients can no longer fill in the
+          questionnaire — they have no accounts and never will.
+        </figcaption>
+      </figure>
+    </div>
+
+    <div class="note">
+      <p><strong>The client has no account and never will.</strong> An agent creates a link and
+      sends it to the client, over WhatsApp for instance. All the transaction details are encoded
+      in the link itself, so it has to open straight away, with no sign-in.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Who does what</h2>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Task</th><th>Owner</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>The application, PDF generation, link creation</td><td class="who">Us — done</td></tr>
+          <tr><td>Deployment and TLS certificate</td><td class="who">Us or you — see step 1</td></tr>
+          <tr><td>DNS record for the subdomain</td><td class="who">You</td></tr>
+          <tr><td>Menu item on the site</td><td class="who">You</td></tr>
+          <tr><td>Access restriction on <code>/izveidot</code></td><td class="who">You</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Implementation steps</h2>
+
+    <div class="steps">
+
+      <div class="stepblock">
+        <div class="stepbody">
+          <h2>Deploying the application</h2>
+          <p>Two options — pick whichever suits you; both work for us.</p>
+          <h3>A. Vercel (free, quickest)</h3>
+          <p>We deploy it; all that is left on your side is the DNS record from step 2.</p>
+          <h3>B. Your server</h3>
+          <p>
+            Needs Node.js 20+ and a reverse proxy. We will send the source as soon as you tell us
+            you are going with this option — either access to a private Git repository or an
+            archive, whichever you prefer. The application listens on port 3000:
+          </p>
+          <pre><code>npm ci
+npm run build
+npm start          <span class="cm"># port 3000</span></code></pre>
+          <p>Example nginx block:</p>
+          <pre><code>server {
+    server_name anketa.ekocentrs.lv;
+    location / {
+        proxy_pass         http://127.0.0.1:3000;
+        proxy_set_header   Host $host;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+    }
+}</code></pre>
+          <div class="note">
+            <p><strong>Worth knowing:</strong> the application launches headless Chromium to build
+            the PDF. On your own server that needs system libraries (<code>libnss3</code>,
+            <code>libatk-bridge2.0-0</code>, <code>libdrm2</code>, <code>libgbm1</code>,
+            <code>libasound2</code>) and around 1&nbsp;GB of free memory. On Vercel it works with
+            no extra setup — which is why we suggest option A.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="stepblock">
+        <div class="stepbody">
+          <h2>DNS record</h2>
+          <p>Add the subdomain <code>anketa.ekocentrs.lv</code>:</p>
+          <pre><code><span class="cm"># Option A — Vercel</span>
+anketa   CNAME   cname.vercel-dns.com.
+
+<span class="cm"># Option B — your server</span>
+anketa   A       &lt;server IP&gt;</code></pre>
+          <p>A TLS certificate is required.</p>
+        </div>
+      </div>
+
+      <div class="stepblock">
+        <div class="stepbody">
+          <h2>Link in the Joomla menu</h2>
+          <p>
+            Joomla admin → <em>Menus → Add New Menu Item</em> → type <em>External URL</em>:
+          </p>
+          <pre><code>URL:           https://anketa.ekocentrs.lv/izveidot
+Access level:  Special (or your agents' level)</code></pre>
+          <p>
+            The access level only hides the link from other visitors — the real restriction is
+            step 4.
+          </p>
+          <div class="note">
+            <p><strong>No iframe.</strong> The agent page should not be embedded in an article as
+            an <code>&lt;iframe&gt;</code>: some browsers block third-party cookies and the page
+            will behave unpredictably. An iframe does not suit the client questionnaire either —
+            all the transaction details live in the link's parameter, and they never reach the
+            inside of an iframe.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="stepblock">
+        <div class="stepbody">
+          <h2>Access restriction on <code>/izveidot</code></h2>
+          <p>
+            We leave this to you — you know best what already works in your infrastructure.
+            Nothing needs configuring on the application's side: it is built to sit behind any
+            external restriction and asks for no sign-in of its own.
+          </p>
+          <p>Three common options, in case they help:</p>
+          <ul>
+            <li><strong>Cloudflare Access</strong> — free for up to 50 users, sign-in with a Google
+              account, and the restriction can be placed on a specific path.</li>
+            <li><strong>IP allowlist</strong> for the office network — the simplest, but an agent
+              cannot then work from home or from a phone.</li>
+            <li><strong>HTTP Basic Auth</strong> on <code>location /izveidot</code> — one password
+              for all agents, two lines in the nginx config.</li>
+          </ul>
+          <p>
+            If something else suits you better, do it the way you think is right. The only
+            condition is the one described at the top of this page: the restriction applies to
+            <code>/izveidot</code> only, and <code>/aizpildit</code> stays public.
+          </p>
+        </div>
+      </div>
+
+      <div class="stepblock">
+        <div class="stepbody">
+          <h2>Checking it works</h2>
+          <ul>
+            <li>An agent in the office opens the menu link → lands on the link-creation page.</li>
+            <li>An outsider opens <code>anketa.ekocentrs.lv/izveidot</code> → does not get in.</li>
+            <li>A client link <code>/aizpildit?d=…</code> opens anonymously — in another browser,
+              on a phone, with no VPN and no account.</li>
+            <li>A client fills the questionnaire in to the end and downloads the PDF.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>When you are done</h2>
+    <p>Two things are enough for us:</p>
+    <ul>
+      <li>confirmation that <code>anketa.ekocentrs.lv</code> exists and points where it should;</li>
+      <li>a short note on how exactly <code>/izveidot</code> is protected — so we know what to tell
+        an agent the first time they try to get in.</li>
+    </ul>
+    <p>
+      If anything is unclear, or something in your infrastructure calls for a different approach,
+      write to us and we will adapt.
+    </p>
+  </section>
+
+  <footer>
+    <div>Ekocentrs Web Solutions · AML/KYC questionnaire</div>
+  </footer>
+</div>
 
 </div>
+
+<script>
+  (function () {
+    var LANGS = ["lv", "ru", "en"];
+    var wrap = document.querySelector(".wrap");
+    var buttons = Array.prototype.slice.call(document.querySelectorAll("[data-set-lang]"));
+
+    function apply(lang) {
+      if (LANGS.indexOf(lang) === -1) return;
+      wrap.setAttribute("data-lang", lang);
+      buttons.forEach(function (button) {
+        button.setAttribute("aria-pressed", String(button.getAttribute("data-set-lang") === lang));
+      });
+      // Remembering the choice is a convenience; a browser that refuses storage
+      // still gets a working switcher, just without the memory.
+      try {
+        localStorage.setItem("anketa-doc-lang", lang);
+      } catch (error) {}
+    }
+
+    try {
+      var saved = localStorage.getItem("anketa-doc-lang");
+      if (saved) apply(saved);
+    } catch (error) {}
+
+    buttons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        apply(button.getAttribute("data-set-lang"));
+      });
+    });
+  })();
+</script>
