@@ -5,7 +5,7 @@ Web-anketa, kas aizstāj papīra/Word formāta AML/KYC anketu nekustamā īpašu
 ## Kā tas darbojas
 
 1. **Aģents** atver `/izveidot`, izvēlas firmu (SIA "EKOCENTRS" / SIA "SUN RAIN"), klienta tipu (fiziska/juridiska persona), lomu (klients/darījuma partneris), un ievada zināmos datus par darījumu (adrese, darījuma veids). Aģents iegūst saiti un/vai QR kodu, ko nosūta klientam.
-2. **Klients** atver saiti (`/aizpildit?d=...`) un aizpilda visu anketu pakāpeniski (wizard), ar nosacītiem laukiem (PEP, sankcijas, pilnvarotā persona, patiesais labuma guvējs u.c. parādās tikai tad, kad tas attiecas).
+2. **Klients** atver saiti (`/aizpildit?d=...`) un aizpilda visu anketu pakāpeniski (wizard), ar nosacītiem laukiem (PEP, sankcijas, pilnvarotā persona, patiesais labuma guvējs u.c. parādās tikai tad, kad tas attiecas). Obligātos laukus nevar izlaist — «Tālāk» pārbauda soli un paliek uz vietas, kamēr tie nav atbildēti; lauki, ko klients neredz, viņu neaptur.
 3. Klients redz gatavā dokumenta priekšskatu un lejupielādē **PDF**. Ja paraksta elektroniski — paraksta to ārēji vietnē [eParaksti.lv](https://www.eparaksts.lv). Ja paraksta ar roku — dokumentā ir tukša vieta parakstam.
 
 Sistēma neglabā neko serverī — visi aģenta izvēlētie dati ir iekodēti pašā saitē (`?d=` parametrā), un PDF tiek ģenerēts pieprasījuma brīdī un tūlīt aizmirsts.

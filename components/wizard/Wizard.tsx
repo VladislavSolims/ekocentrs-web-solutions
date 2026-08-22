@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import type { Answers, QuestionnaireSchema } from "@/schemas/types";
+import { isFieldVisible } from "@/schemas/validation";
 import { StepRenderer } from "./StepRenderer";
 
 type WizardProps = {
@@ -12,7 +13,9 @@ type WizardProps = {
 };
 
 export function Wizard({ schema, context = {}, onComplete }: WizardProps) {
-  const form = useForm({ defaultValues: context });
+  // onChange so a message disappears the moment the client fixes the field,
+  // rather than only on the next attempt to move on.
+  const form = useForm({ defaultValues: context, mode: "onChange" });
   const [stepIndex, setStepIndex] = useState(0);
 
   const liveAnswers = { ...context, ...form.watch() };
@@ -23,7 +26,15 @@ export function Wizard({ schema, context = {}, onComplete }: WizardProps) {
   const currentStep = visibleSteps[stepIndex];
   const isLastStep = stepIndex === visibleSteps.length - 1;
 
-  function handleNext() {
+  async function handleNext() {
+    // Only what this step actually shows: a required field hidden by visibleIf,
+    // or one belonging to a later step, must not hold the client back here.
+    const fieldsInPlay = currentStep.fields
+      .filter((field) => isFieldVisible(field, liveAnswers))
+      .map((field) => field.id);
+
+    if (!(await form.trigger(fieldsInPlay))) return;
+
     if (isLastStep) {
       onComplete({ ...context, ...form.getValues() });
     } else {
@@ -70,7 +81,9 @@ export function Wizard({ schema, context = {}, onComplete }: WizardProps) {
           )}
           <button
             type="button"
-            onClick={handleNext}
+            onClick={() => {
+              void handleNext();
+            }}
             className="rounded-md bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700"
           >
             {isLastStep ? "Pabeigt" : "Tālāk"}
