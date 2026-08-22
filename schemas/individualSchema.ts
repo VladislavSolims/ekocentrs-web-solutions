@@ -26,7 +26,7 @@ export const individualSchema: QuestionnaireSchema = {
         { id: "nationality", label: "Valsts piederība", type: "text", required: true },
         {
           id: "residenceCountry",
-          label: "Pastāvīgās dzīvesvietas (rezidences) valsts",
+          label: "Pastāvīgā dzīvesvieta",
           type: "text",
           required: true,
         },

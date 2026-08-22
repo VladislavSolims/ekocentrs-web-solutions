@@ -27,7 +27,7 @@ test("individual client fills out the questionnaire and downloads a PDF", async 
   await page.getByLabel("E-pasts", { exact: true }).fill("janis.berzins@example.com");
   await page.getByLabel("Dzimšanas vieta", { exact: true }).fill("Rīga");
   await page.getByLabel("Valsts piederība", { exact: true }).fill("Latvija");
-  await page.getByLabel("Pastāvīgās dzīvesvietas (rezidences) valsts", { exact: true }).fill("Latvija");
+  await page.getByLabel("Pastāvīgā dzīvesvieta", { exact: true }).fill("Latvija");
   await page.getByRole("button", { name: "Tālāk", exact: true }).click();
 
   // Step: economic activity & source of funds
