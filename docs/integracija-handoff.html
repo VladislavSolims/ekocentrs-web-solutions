@@ -337,7 +337,7 @@
   <section class="summary">
     <h2>Īsumā</h2>
     <ol>
-      <li>Anketa tiek izvietota uz <code>anketa.ekocentrs.lv</code> (Vercel vai jūsu serveris).</li>
+      <li>Anketa tiek izvietota uz <code>anketa.ekocentrs.lv</code> jūsu serverī.</li>
       <li>Joomla izvēlnē parādās saite uz to.</li>
       <li>Vienai lapai — <code>/izveidot</code> — jāierobežo piekļuve tā, kā jums ērtāk. Pārējais paliek publisks.</li>
     </ol>
@@ -408,7 +408,7 @@
         </thead>
         <tbody>
           <tr><td>Anketas lietotne, PDF ģenerēšana, saišu izveide</td><td class="who">Mēs — gatavs</td></tr>
-          <tr><td>Lietotnes izvietošana (deploy) un TLS sertifikāts</td><td class="who">Mēs vai jūs — sk. 1. soli</td></tr>
+          <tr><td>Lietotnes izvietošana un TLS sertifikāts</td><td class="who">Jūs</td></tr>
           <tr><td>DNS ieraksts subdomain-am</td><td class="who">Jūs</td></tr>
           <tr><td>Izvēlnes elements vietnē</td><td class="who">Jūs</td></tr>
           <tr><td>Piekļuves ierobežojums <code>/izveidot</code> lapai</td><td class="who">Jūs</td></tr>
@@ -424,19 +424,50 @@
 
       <div class="stepblock">
         <div class="stepbody">
-          <h2>Lietotnes izvietošana</h2>
-          <p>Divas iespējas — izvēlieties to, kas jums ērtāka; abas mums der.</p>
-          <h3>A. Vercel (ātrākais)</h3>
-          <p>Lietotni izvietojam mēs, jums paliek tikai DNS ieraksts no 2. soļa.</p>
-          <h3>B. Jūsu serveris</h3>
+          <h2>Lietotnes izvietošana jūsu serverī</h2>
+          <p>Kas nepieciešams: Node.js 20+, git un aptuveni 1&nbsp;GB brīvas RAM (sk. piezīmi zemāk).</p>
           <p>
-            Nepieciešams Node.js 20+ un reverse proxy. Pirmkodu nosūtīsim, tiklīdz pateiksiet,
-            ka izvēlaties šo variantu — vai nu piekļuvi privātam Git repozitorijam, vai arhīvu,
-            kā jums ērtāk. Lietotne klausās uz porta 3000:
+            Pirmkods ir privātā Git repozitorijā. Ērtākais veids, kā to dabūt uz servera —
+            uz paša servera uzģenerējiet atslēgu un atsūtiet mums <strong>publisko</strong> daļu
+            (<code>.pub</code> faila saturs, to var sūtīt parastā e-pastā):
+          </p>
+          <pre><code>ssh-keygen -t ed25519 -C "anketa-deploy" -f ~/.ssh/anketa_deploy
+cat ~/.ssh/anketa_deploy.pub</code></pre>
+          <p>
+            Mēs to pievienosim repozitorijam kā <em>deploy key</em> tikai lasīšanai — tālāk
+            <code>git clone</code> un vēlāk <code>git pull</code> atjauninājumiem. Privātā atslēga
+            nekad neatstāj jūsu serveri. Ja jums ērtāk vienkārši arhīvs — pasakiet, atsūtīsim.
           </p>
           <pre><code>npm ci
 npm run build
 npm start          <span class="cm"># ports 3000</span></code></pre>
+
+          <h3>Viens vides mainīgais</h3>
+          <p>
+            Projekta saknē izveidojiet <code>.env.local</code> ar vienu rindu:
+          </p>
+          <pre><code>AGENT_LOGIN=external</code></pre>
+          <p>
+            Tas nozīmē: par piekļuvi rūpējas kaut kas lietotnes priekšā (4. solis), un pati
+            lietotne pieteikšanos neprasa. <strong>Noklusējuma vērtības nav ar nodomu</strong> — ja
+            mainīgais nav uzstādīts, lietotne atsakās atdot <code>/izveidot</code> lapu, nevis klusi
+            atver to visiem.
+          </p>
+
+          <h3>Lai strādā arī pēc pārstartēšanas</h3>
+          <p>Piemēra systemd serviss:</p>
+          <pre><code>[Unit]
+Description=Ekocentrs anketa
+After=network.target
+
+[Service]
+WorkingDirectory=/var/www/anketa
+ExecStart=/usr/bin/npm start
+Restart=always
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target</code></pre>
           <p>Piemēra nginx bloks:</p>
           <pre><code>server {
     server_name anketa.ekocentrs.lv;
@@ -450,8 +481,8 @@ npm start          <span class="cm"># ports 3000</span></code></pre>
             <p><strong>Svarīgi:</strong> PDF ģenerēšanai lietotne palaiž headless Chromium.
             Uz sava servera tam vajadzīgas sistēmas bibliotēkas (<code>libnss3</code>,
             <code>libatk-bridge2.0-0</code>, <code>libdrm2</code>, <code>libgbm1</code>,
-            <code>libasound2</code>) un ~1&nbsp;GB brīvas RAM. Uz Vercel tas darbojas bez papildu
-            darbībām — tāpēc iesakām variantu A.</p>
+            <code>libasound2</code>) un ~1&nbsp;GB brīvas RAM. Ja PDF neģenerējas, meklējiet
+            problēmu šeit — pārējā lietotne strādā arī bez tām.</p>
           </div>
         </div>
       </div>
@@ -460,11 +491,7 @@ npm start          <span class="cm"># ports 3000</span></code></pre>
         <div class="stepbody">
           <h2>DNS ieraksts</h2>
           <p>Pievienojiet subdomain <code>anketa.ekocentrs.lv</code>:</p>
-          <pre><code><span class="cm"># Variants A — Vercel</span>
-anketa   CNAME   cname.vercel-dns.com.
-
-<span class="cm"># Variants B — jūsu serveris</span>
-anketa   A       &lt;servera IP&gt;</code></pre>
+          <pre><code>anketa   A       &lt;servera IP&gt;</code></pre>
           <p>TLS sertifikāts obligāts.</p>
         </div>
       </div>
@@ -533,8 +560,9 @@ Piekļuves līmenis: Special (vai jūsu aģentu līmenis)</code></pre>
 
   <section>
     <h2>Kad esat pabeidzis</h2>
-    <p>Mums pietiek ar divām lietām:</p>
+    <p>Mums vajag trīs lietas:</p>
     <ul>
+      <li>publiskā deploy atslēga no 1. soļa (vai ziņa, ka vēlaties arhīvu);</li>
       <li>apstiprinājums, ka <code>anketa.ekocentrs.lv</code> ir izveidots un norāda uz pareizo vietu;</li>
       <li>īss apraksts, kā tieši <code>/izveidot</code> ir aizsargāts — lai mēs zinātu, ko teikt
         aģentam, kad viņš pirmoreiz mēģinās ieiet.</li>
@@ -570,7 +598,7 @@ Piekļuves līmenis: Special (vai jūsu aģentu līmenis)</code></pre>
   <section class="summary">
     <h2>Коротко</h2>
     <ol>
-      <li>Приложение размещается на <code>anketa.ekocentrs.lv</code> (Vercel или ваш сервер).</li>
+      <li>Приложение размещается на <code>anketa.ekocentrs.lv</code> на вашем сервере.</li>
       <li>В меню Joomla появляется ссылка на него.</li>
       <li>Одну страницу — <code>/izveidot</code> — нужно закрыть от посторонних так, как вам удобнее. Остальное остаётся публичным.</li>
     </ol>
@@ -638,7 +666,7 @@ Piekļuves līmenis: Special (vai jūsu aģentu līmenis)</code></pre>
         </thead>
         <tbody>
           <tr><td>Приложение, генерация PDF, создание ссылок</td><td class="who">Мы — готово</td></tr>
-          <tr><td>Размещение приложения и TLS-сертификат</td><td class="who">Мы или вы — см. шаг 1</td></tr>
+          <tr><td>Размещение приложения и TLS-сертификат</td><td class="who">Вы</td></tr>
           <tr><td>DNS-запись для поддомена</td><td class="who">Вы</td></tr>
           <tr><td>Пункт меню на сайте</td><td class="who">Вы</td></tr>
           <tr><td>Ограничение доступа к <code>/izveidot</code></td><td class="who">Вы</td></tr>
@@ -654,19 +682,50 @@ Piekļuves līmenis: Special (vai jūsu aģentu līmenis)</code></pre>
 
       <div class="stepblock">
         <div class="stepbody">
-          <h2>Размещение приложения</h2>
-          <p>Два варианта — выберите тот, что вам удобнее; нас устраивают оба.</p>
-          <h3>A. Vercel (быстрее всего)</h3>
-          <p>Размещаем мы, с вашей стороны остаётся только DNS-запись из шага 2.</p>
-          <h3>B. Ваш сервер</h3>
+          <h2>Размещение приложения на вашем сервере</h2>
+          <p>Что нужно: Node.js 20+, git и около 1&nbsp;ГБ свободной памяти (см. примечание ниже).</p>
           <p>
-            Нужен Node.js 20+ и reverse proxy. Исходный код пришлём, как только вы скажете,
-            что выбираете этот вариант, — либо доступ к приватному Git-репозиторию, либо
-            архивом, как вам удобнее. Приложение слушает порт 3000:
+            Исходный код лежит в приватном Git-репозитории. Самый удобный способ получить его на
+            сервер — сгенерировать ключ прямо на сервере и прислать нам <strong>публичную</strong>
+            часть (содержимое файла <code>.pub</code>, её можно слать обычной почтой):
+          </p>
+          <pre><code>ssh-keygen -t ed25519 -C "anketa-deploy" -f ~/.ssh/anketa_deploy
+cat ~/.ssh/anketa_deploy.pub</code></pre>
+          <p>
+            Мы добавим её к репозиторию как <em>deploy key</em> только на чтение — дальше
+            <code>git clone</code>, а для обновлений <code>git pull</code>. Приватный ключ при
+            этом никогда не покидает ваш сервер. Если удобнее просто архив — скажите, пришлём.
           </p>
           <pre><code>npm ci
 npm run build
 npm start          <span class="cm"># порт 3000</span></code></pre>
+
+          <h3>Одна переменная окружения</h3>
+          <p>
+            В корне проекта создайте <code>.env.local</code> с одной строкой:
+          </p>
+          <pre><code>AGENT_LOGIN=external</code></pre>
+          <p>
+            Это означает: за доступ отвечает то, что стоит перед приложением (шаг 4), а само
+            приложение входа не требует. <strong>Значения по умолчанию нет намеренно</strong> —
+            если переменная не задана, приложение откажется отдавать страницу
+            <code>/izveidot</code>, вместо того чтобы молча открыть её всем.
+          </p>
+
+          <h3>Чтобы работало и после перезагрузки</h3>
+          <p>Пример systemd-сервиса:</p>
+          <pre><code>[Unit]
+Description=Ekocentrs anketa
+After=network.target
+
+[Service]
+WorkingDirectory=/var/www/anketa
+ExecStart=/usr/bin/npm start
+Restart=always
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target</code></pre>
           <p>Пример блока nginx:</p>
           <pre><code>server {
     server_name anketa.ekocentrs.lv;
@@ -680,8 +739,8 @@ npm start          <span class="cm"># порт 3000</span></code></pre>
             <p><strong>Важно:</strong> для генерации PDF приложение запускает headless Chromium.
             На своём сервере для этого нужны системные библиотеки (<code>libnss3</code>,
             <code>libatk-bridge2.0-0</code>, <code>libdrm2</code>, <code>libgbm1</code>,
-            <code>libasound2</code>) и около 1&nbsp;ГБ свободной памяти. На Vercel это работает
-            без дополнительных действий — поэтому рекомендуем вариант A.</p>
+            <code>libasound2</code>) и около 1&nbsp;ГБ свободной памяти. Если PDF не генерируется,
+            причину стоит искать здесь — остальное приложение работает и без них.</p>
           </div>
         </div>
       </div>
@@ -690,11 +749,7 @@ npm start          <span class="cm"># порт 3000</span></code></pre>
         <div class="stepbody">
           <h2>DNS-запись</h2>
           <p>Добавьте поддомен <code>anketa.ekocentrs.lv</code>:</p>
-          <pre><code><span class="cm"># Вариант A — Vercel</span>
-anketa   CNAME   cname.vercel-dns.com.
-
-<span class="cm"># Вариант B — ваш сервер</span>
-anketa   A       &lt;IP сервера&gt;</code></pre>
+          <pre><code>anketa   A       &lt;IP сервера&gt;</code></pre>
           <p>TLS-сертификат обязателен.</p>
         </div>
       </div>
@@ -763,8 +818,9 @@ anketa   A       &lt;IP сервера&gt;</code></pre>
 
   <section>
     <h2>Когда закончите</h2>
-    <p>Нам достаточно двух вещей:</p>
+    <p>Нам нужны три вещи:</p>
     <ul>
+      <li>публичный deploy-ключ из шага 1 (или сообщение, что предпочитаете архив);</li>
       <li>подтверждение, что <code>anketa.ekocentrs.lv</code> создан и указывает куда нужно;</li>
       <li>короткое описание, чем именно защищён <code>/izveidot</code> — чтобы мы знали, что
         сказать агенту, когда он в первый раз попробует зайти.</li>
@@ -800,7 +856,7 @@ anketa   A       &lt;IP сервера&gt;</code></pre>
   <section class="summary">
     <h2>In short</h2>
     <ol>
-      <li>The application is deployed to <code>anketa.ekocentrs.lv</code> (Vercel or your server).</li>
+      <li>The application is deployed to <code>anketa.ekocentrs.lv</code> on your server.</li>
       <li>A link to it appears in the Joomla menu.</li>
       <li>One page — <code>/izveidot</code> — needs to be closed off, however suits you best. Everything else stays public.</li>
     </ol>
@@ -868,7 +924,7 @@ anketa   A       &lt;IP сервера&gt;</code></pre>
         </thead>
         <tbody>
           <tr><td>The application, PDF generation, link creation</td><td class="who">Us — done</td></tr>
-          <tr><td>Deployment and TLS certificate</td><td class="who">Us or you — see step 1</td></tr>
+          <tr><td>Deployment and TLS certificate</td><td class="who">You</td></tr>
           <tr><td>DNS record for the subdomain</td><td class="who">You</td></tr>
           <tr><td>Menu item on the site</td><td class="who">You</td></tr>
           <tr><td>Access restriction on <code>/izveidot</code></td><td class="who">You</td></tr>
@@ -884,19 +940,50 @@ anketa   A       &lt;IP сервера&gt;</code></pre>
 
       <div class="stepblock">
         <div class="stepbody">
-          <h2>Deploying the application</h2>
-          <p>Two options — pick whichever suits you; both work for us.</p>
-          <h3>A. Vercel (quickest)</h3>
-          <p>We deploy it; all that is left on your side is the DNS record from step 2.</p>
-          <h3>B. Your server</h3>
+          <h2>Deploying the application on your server</h2>
+          <p>What it needs: Node.js 20+, git, and around 1&nbsp;GB of free RAM (see the note below).</p>
           <p>
-            Needs Node.js 20+ and a reverse proxy. We will send the source as soon as you tell us
-            you are going with this option — either access to a private Git repository or an
-            archive, whichever you prefer. The application listens on port 3000:
+            The source lives in a private Git repository. The easiest way to get it onto the
+            server is to generate a key on the server itself and send us the <strong>public</strong>
+            half (the contents of the <code>.pub</code> file — safe to send by ordinary email):
+          </p>
+          <pre><code>ssh-keygen -t ed25519 -C "anketa-deploy" -f ~/.ssh/anketa_deploy
+cat ~/.ssh/anketa_deploy.pub</code></pre>
+          <p>
+            We will add it to the repository as a read-only <em>deploy key</em> — then
+            <code>git clone</code>, and <code>git pull</code> for later updates. The private key
+            never leaves your server. If an archive is simpler for you, just say so.
           </p>
           <pre><code>npm ci
 npm run build
 npm start          <span class="cm"># port 3000</span></code></pre>
+
+          <h3>One environment variable</h3>
+          <p>
+            Create <code>.env.local</code> in the project root with a single line:
+          </p>
+          <pre><code>AGENT_LOGIN=external</code></pre>
+          <p>
+            This says: access is handled by whatever sits in front of the application (step 4),
+            and the application asks for no sign-in of its own. <strong>There is deliberately no
+            default</strong> — with the variable unset the application refuses to serve
+            <code>/izveidot</code> rather than quietly opening it to everyone.
+          </p>
+
+          <h3>Surviving a reboot</h3>
+          <p>Example systemd service:</p>
+          <pre><code>[Unit]
+Description=Ekocentrs anketa
+After=network.target
+
+[Service]
+WorkingDirectory=/var/www/anketa
+ExecStart=/usr/bin/npm start
+Restart=always
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target</code></pre>
           <p>Example nginx block:</p>
           <pre><code>server {
     server_name anketa.ekocentrs.lv;
@@ -910,8 +997,8 @@ npm start          <span class="cm"># port 3000</span></code></pre>
             <p><strong>Worth knowing:</strong> the application launches headless Chromium to build
             the PDF. On your own server that needs system libraries (<code>libnss3</code>,
             <code>libatk-bridge2.0-0</code>, <code>libdrm2</code>, <code>libgbm1</code>,
-            <code>libasound2</code>) and around 1&nbsp;GB of free memory. On Vercel it works with
-            no extra setup — which is why we suggest option A.</p>
+            <code>libasound2</code>) and around 1&nbsp;GB of free memory. If the PDF fails to
+            generate, this is where to look — the rest of the application runs without them.</p>
           </div>
         </div>
       </div>
@@ -920,11 +1007,7 @@ npm start          <span class="cm"># port 3000</span></code></pre>
         <div class="stepbody">
           <h2>DNS record</h2>
           <p>Add the subdomain <code>anketa.ekocentrs.lv</code>:</p>
-          <pre><code><span class="cm"># Option A — Vercel</span>
-anketa   CNAME   cname.vercel-dns.com.
-
-<span class="cm"># Option B — your server</span>
-anketa   A       &lt;server IP&gt;</code></pre>
+          <pre><code>anketa   A       &lt;server IP&gt;</code></pre>
           <p>A TLS certificate is required.</p>
         </div>
       </div>
@@ -994,8 +1077,9 @@ Access level:  Special (or your agents' level)</code></pre>
 
   <section>
     <h2>When you are done</h2>
-    <p>Two things are enough for us:</p>
+    <p>Three things from you:</p>
     <ul>
+      <li>the public deploy key from step 1 (or a note that you would rather have an archive);</li>
       <li>confirmation that <code>anketa.ekocentrs.lv</code> exists and points where it should;</li>
       <li>a short note on how exactly <code>/izveidot</code> is protected — so we know what to tell
         an agent the first time they try to get in.</li>
