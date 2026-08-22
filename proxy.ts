@@ -7,6 +7,9 @@
  * Only `/izveidot` is protected. The client questionnaire (`/aizpildit?d=…`)
  * stays open on purpose — a client fills it in once, from a link, and should
  * never need an account.
+ *
+ * With AGENT_LOGIN=external the guard sits in front of the app instead (see
+ * config/auth.ts) and this file steps aside.
  */
 import { NextResponse, type NextRequest } from "next/server";
 import { readAuthConfig } from "@/config/auth";
@@ -18,6 +21,11 @@ export const config = {
 
 export async function proxy(request: NextRequest): Promise<NextResponse> {
   const auth = readAuthConfig();
+
+  // Whatever stands in front of the app already turned away everyone who is
+  // not an agent — anything arriving here has passed that gate.
+  if (auth.mode === "external") return NextResponse.next();
+
   const session = await readSession(
     request.cookies.get(SESSION_COOKIE_NAME)?.value,
     auth.sessionSecret

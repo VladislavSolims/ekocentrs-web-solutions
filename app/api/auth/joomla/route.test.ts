@@ -38,6 +38,7 @@ function cookieNamed(response: Response, name: string): string | undefined {
 }
 
 beforeEach(() => {
+  vi.stubEnv("AGENT_LOGIN", "joomla");
   vi.stubEnv("JOOMLA_SSO_SECRET", JOOMLA_SECRET);
   vi.stubEnv("SESSION_SECRET", SESSION_SECRET);
   vi.stubEnv("JOOMLA_LOGIN_URL", LOGIN_URL);
@@ -117,5 +118,16 @@ describe("GET /api/auth/joomla", () => {
 
     expect(response.headers.get("location")).toBe(LOGIN_URL);
     expect(cookieNamed(response, SESSION_COOKIE_NAME)).toBeUndefined();
+  });
+});
+
+describe("GET /api/auth/joomla when the app is not doing the login", () => {
+  it("is not there at all", async () => {
+    vi.stubEnv("AGENT_LOGIN", "external");
+
+    const response = await GET(request(await handOffToken()));
+
+    expect(response.status).toBe(404);
+    expect(setCookies(response)).toEqual([]);
   });
 });

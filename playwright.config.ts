@@ -1,5 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 import {
+  E2E_AGENT_LOGIN,
   E2E_JOOMLA_SECRET,
   E2E_SESSION_SECRET,
   E2E_JOOMLA_LOGIN_URL,
@@ -20,6 +21,7 @@ export default defineConfig({
     // .env.local carries the same values, so a dev server started by hand
     // (reuseExistingServer) accepts the same tokens the tests mint.
     env: {
+      AGENT_LOGIN: E2E_AGENT_LOGIN,
       JOOMLA_SSO_SECRET: E2E_JOOMLA_SECRET,
       SESSION_SECRET: E2E_SESSION_SECRET,
       JOOMLA_LOGIN_URL: E2E_JOOMLA_LOGIN_URL,

@@ -169,6 +169,12 @@
   .cm { color: #7f9c8b; }
   .st { color: #c3d8a8; }
 
+  /* ---------- figures ---------- */
+  figure { margin: 0.5rem 0; display: flex; flex-direction: column; gap: 0.6rem; }
+  .fig-scroll { overflow-x: auto; }
+  svg { max-width: 100%; height: auto; display: block; min-width: 30rem; }
+  figcaption { font-size: 0.87rem; color: var(--muted); max-width: var(--measure); }
+
   /* ---------- summary card ---------- */
   .summary {
     background: var(--accent-soft);
@@ -270,14 +276,14 @@
     <h1>Anketas integrācija ekocentrs.lv vietnē</h1>
     <p class="standfirst">
       AML/KYC klienta identifikācijas anketa ir patstāvīga Next.js lietotne. Tā netiek instalēta
-      Joomla iekšienē — tā darbojas uz sava subdomain, un no vietnes uz to ved saite.
-      Šis dokuments apraksta visu, kas jādara Joomla pusē.
+      Joomla iekšienē un neprasa nekādas izmaiņas vietnes kodā — tā darbojas uz sava subdomain,
+      un no vietnes uz to ved parasta saite.
     </p>
     <dl class="facts">
       <div class="fact"><dt>Vietne</dt><dd>Joomla 3.10.10</dd></div>
       <div class="fact"><dt>Lietotne</dt><dd>Next.js 16 / Node</dd></div>
       <div class="fact"><dt>Subdomain</dt><dd>anketa.ekocentrs.lv</dd></div>
-      <div class="fact"><dt>Joomla koda izmaiņas</dt><dd>1 fails</dd></div>
+      <div class="fact"><dt>Izmaiņas Joomla kodā</dt><dd>nav</dd></div>
     </dl>
   </header>
 
@@ -285,10 +291,65 @@
     <h2>Īsumā</h2>
     <ol>
       <li>Anketa tiek izvietota uz <code>anketa.ekocentrs.lv</code> (Vercel vai jūsu serveris).</li>
-      <li>Joomla saknē tiek pievienots viens PHP fails — autorizācijas tilts.</li>
-      <li>Joomla izvēlnē parādās saite uz šo failu; tā ir redzama tikai aģentu lietotāju grupai.</li>
-      <li>Klientam nekas nav jāreģistrē — viņš aizpilda anketu pa saiti, ko atsūta aģents.</li>
+      <li>Joomla izvēlnē parādās saite uz to.</li>
+      <li>Vienai lapai — <code>/izveidot</code> — jāierobežo piekļuve tā, kā jums ērtāk. Pārējais paliek publisks.</li>
     </ol>
+  </section>
+
+  <section>
+    <h2>Divas lapas ar pretējām prasībām</h2>
+    <p>
+      Šī ir vienīgā vieta, kur kaut ko var viegli sajaukt, tāpēc tā ir pašā sākumā.
+      Lietotnē ir divas lapas, un tām vajag tieši pretējo.
+    </p>
+
+    <div class="fig-scroll">
+      <figure>
+        <svg viewBox="0 0 820 260" role="img" aria-label="Divas lapas: /izveidot ir aģentu lapa, kurai jābūt slēgtai; /aizpildit ir klienta anketa, kurai jāpaliek publiskai. Ierobežojums jāliek tikai uz /izveidot, nevis uz visu subdomain.">
+          <defs>
+            <marker id="hx" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+            </marker>
+          </defs>
+
+          <text x="24" y="30" font-size="12" font-weight="600" fill="currentColor">anketa.ekocentrs.lv</text>
+
+          <!-- agent page -->
+          <rect x="24" y="52" width="360" height="86" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"/>
+          <text x="44" y="78" font-size="13" font-weight="600" fill="var(--accent)">/izveidot</text>
+          <text x="44" y="99" font-size="11.5" fill="var(--accent)">Aģentu lapa — saišu izveide.</text>
+          <text x="44" y="117" font-size="11.5" fill="var(--accent)">Jābūt slēgtai.</text>
+
+          <!-- client page -->
+          <rect x="436" y="52" width="360" height="86" rx="6" fill="currentColor" opacity="0.07"/>
+          <rect x="436" y="52" width="360" height="86" rx="6" fill="none" stroke="currentColor" stroke-width="1" opacity="0.35"/>
+          <text x="456" y="78" font-size="13" font-weight="600" fill="currentColor">/aizpildit?d=…</text>
+          <text x="456" y="99" font-size="11.5" fill="currentColor" opacity="0.8">Klienta anketa, atveras pa saiti.</text>
+          <text x="456" y="117" font-size="11.5" fill="currentColor" opacity="0.8">Jāpaliek publiskai.</text>
+
+          <!-- actors -->
+          <text x="204" y="176" text-anchor="middle" font-size="11.5" fill="currentColor" opacity="0.75">tikai aģenti</text>
+          <line x1="204" y1="190" x2="204" y2="146" stroke="var(--accent)" stroke-width="1.4" marker-end="url(#hx)"/>
+
+          <text x="616" y="176" text-anchor="middle" font-size="11.5" fill="currentColor" opacity="0.75">jebkurš klients ar saiti</text>
+          <line x1="616" y1="190" x2="616" y2="146" stroke="currentColor" stroke-width="1.4" marker-end="url(#hx)"/>
+
+          <text x="410" y="228" text-anchor="middle" font-size="12" fill="currentColor">
+            Ierobežojums jāliek uz ceļu /izveidot, nevis uz visu subdomain.
+          </text>
+        </svg>
+        <figcaption>
+          Ja aizsardzība tiek uzlikta uz visu subdomain, klienti vairs nevar aizpildīt anketu —
+          viņiem nav un nebūs nekādu kontu.
+        </figcaption>
+      </figure>
+    </div>
+
+    <div class="note">
+      <p><strong>Klients kontu nesaņem un nesaņems.</strong> Aģents izveido saiti un nosūta to
+      klientam, piemēram, WhatsApp. Visi darījuma dati ir iekodēti pašā saitē, tāpēc saitei
+      jāatveras uzreiz, bez pieteikšanās.</p>
+    </div>
   </section>
 
   <section>
@@ -300,38 +361,13 @@
         </thead>
         <tbody>
           <tr><td>Anketas lietotne, PDF ģenerēšana, saišu izveide</td><td class="who">Mēs — gatavs</td></tr>
-          <tr><td>Marķiera pārbaude lietotnes pusē, sesijas sīkdatne, <code>/izveidot</code> aizsardzība</td><td class="who">Mēs — gatavs</td></tr>
           <tr><td>Lietotnes izvietošana (deploy) un TLS sertifikāts</td><td class="who">Mēs vai jūs — sk. 1. soli</td></tr>
           <tr><td>DNS ieraksts subdomain-am</td><td class="who">Jūs</td></tr>
-          <tr><td>Autorizācijas tilts Joomla pusē</td><td class="who">Jūs</td></tr>
-          <tr><td>Izvēlnes elements un piekļuves līmenis</td><td class="who">Jūs</td></tr>
-          <tr><td>Koplietotais noslēpums (secret) un aģentu lietotāju grupa</td><td class="who">Jūs → mums</td></tr>
+          <tr><td>Izvēlnes elements vietnē</td><td class="who">Jūs</td></tr>
+          <tr><td>Piekļuves ierobežojums <code>/izveidot</code> lapai</td><td class="who">Jūs</td></tr>
         </tbody>
       </table>
     </div>
-  </section>
-
-  <section>
-    <h2>Darbības principa shēma</h2>
-    <p>
-      Joomla paliek vienīgā vieta, kur glabājas aģentu paroles. Anketas lietotne pati paroles
-      nepārbauda un nesaglabā — tā uzticas īsdzīvojošam, parakstītam marķierim, ko izsniedz Joomla.
-    </p>
-    <pre><code>Aģents → anketa.ekocentrs.lv/izveidot
-             │  nav sesijas
-             ▼
-        ekocentrs.lv/kyc-sso.php
-             │  Joomla pārbauda: vai pieteicies? vai pareizajā grupā?
-             │  ja nav pieteicies → parastā Joomla login forma
-             ▼
-        pāradresācija atpakaļ ar marķieri (derīgs 30 s, parakstīts ar HMAC)
-             ▼
-     anketa.ekocentrs.lv/api/auth/joomla
-             │  pārbauda parakstu → uzliek httpOnly sesijas sīkdatni
-             ▼
-          /izveidot  — aģents izveido saiti klientam
-
-Klients → /aizpildit?d=…   (publiska lapa, autorizācija nav vajadzīga)</code></pre>
   </section>
 
   <section>
@@ -378,115 +414,52 @@ anketa   CNAME   cname.vercel-dns.com.
 
 <span class="cm"># Variants B — jūsu serveris</span>
 anketa   A       &lt;servera IP&gt;</code></pre>
-          <p>TLS sertifikāts obligāts — bez HTTPS sesijas sīkdatne nestrādās.</p>
+          <p>TLS sertifikāts obligāts.</p>
         </div>
       </div>
 
       <div class="stepblock">
         <div class="stepbody">
-          <h2>Autorizācijas tilts Joomla pusē</h2>
-          <p>
-            Izveidojiet failu <code>kyc-sso.php</code> Joomla saknes direktorijā (blakus
-            <code>index.php</code>). Tas ir vienīgais jaunais kods vietnē — Joomla kodols un
-            paplašinājumi netiek aiztikti.
-          </p>
-          <pre><code>&lt;?php
-<span class="cm">/**
- * kyc-sso.php — tilts starp Joomla sesiju un anketas lietotni.
- * Ievieto Joomla saknes direktorijā.
- */</span>
-define(<span class="st">'_JEXEC'</span>, 1);
-define(<span class="st">'JPATH_BASE'</span>, __DIR__);
-
-require_once JPATH_BASE . <span class="st">'/includes/defines.php'</span>;
-require_once JPATH_BASE . <span class="st">'/includes/framework.php'</span>;
-
-<span class="cm">// --- konfigurācija -------------------------------------------------</span>
-$secret  = <span class="st">'&lt;KOPLIETOTAIS_NOSLĒPUMS&gt;'</span>;   <span class="cm">// sk. 5. soli</span>
-$appUrl  = <span class="st">'https://anketa.ekocentrs.lv'</span>;
-$groupId = 10;                            <span class="cm">// aģentu lietotāju grupas ID</span>
-<span class="cm">// -------------------------------------------------------------------</span>
-
-$app = JFactory::getApplication(<span class="st">'site'</span>);
-$app-&gt;initialise();
-
-$user = JFactory::getUser();
-
-<span class="cm">// Nav pieteicies → parastā Joomla login forma, pēc tam atpakaļ šurp.</span>
-if ($user-&gt;guest) {
-    $return = base64_encode(JUri::getInstance()-&gt;toString());
-    $app-&gt;redirect(
-        JRoute::_(<span class="st">'index.php?option=com_users&amp;view=login&amp;return='</span> . $return, false)
-    );
-}
-
-<span class="cm">// Pieteicies, bet nav aģentu grupā → atpakaļ uz sākumlapu.</span>
-if (!in_array($groupId, $user-&gt;getAuthorisedGroups())) {
-    $app-&gt;enqueueMessage(<span class="st">'Jums nav piekļuves anketas rīkam.'</span>, <span class="st">'error'</span>);
-    $app-&gt;redirect(JRoute::_(<span class="st">'index.php'</span>, false));
-}
-
-<span class="cm">// Viss kārtībā → izsniedz marķieri, derīgu 30 sekundes.</span>
-$payload = json_encode([
-    <span class="st">'sub'</span>   =&gt; (int) $user-&gt;id,
-    <span class="st">'name'</span>  =&gt; $user-&gt;name,
-    <span class="st">'email'</span> =&gt; $user-&gt;email,
-    <span class="st">'iat'</span>   =&gt; time(),
-    <span class="st">'exp'</span>   =&gt; time() + 30,
-    <span class="st">'jti'</span>   =&gt; bin2hex(random_bytes(16)),
-], JSON_UNESCAPED_UNICODE);
-
-$body  = rtrim(strtr(base64_encode($payload), <span class="st">'+/'</span>, <span class="st">'-_'</span>), <span class="st">'='</span>);
-$sig   = hash_hmac(<span class="st">'sha256'</span>, $body, $secret);
-
-$app-&gt;redirect($appUrl . <span class="st">'/api/auth/joomla?token='</span> . urlencode($body . <span class="st">'.'</span> . $sig));</code></pre>
-          <p>
-            Marķieris ir <code>base64url(JSON) + "." + HMAC-SHA256</code>. Mūsu pusē paraksts tiek
-            salīdzināts nemainīgā laikā, un derīguma termiņu mēs piemērojam paši — ne ilgāk par
-            30 sekundēm no <code>iat</code>, neatkarīgi no tā, ko prasa <code>exp</code>. Lietotne
-            apzināti darbojas bez datubāzes, tāpēc izlietotie marķieri netiek glabāti; aizsardzība
-            ir īsais logs un HTTPS.
-          </p>
-          <div class="note">
-            <p><strong>Nepieciešams PHP 7.0+</strong> — <code>random_bytes()</code> dēļ. Joomla 3.10
-            to prasa jebkurā gadījumā. Ja uz servera ir vecāks PHP, dodiet ziņu — nomainīsim uz
-            citu nejaušības avotu.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="stepblock">
-        <div class="stepbody">
-          <h2>Izvēlnes elements</h2>
+          <h2>Saite Joomla izvēlnē</h2>
           <p>
             Joomla admin → <em>Izvēlne → Jauns elements</em> → tips <em>Ārēja URL</em>:
           </p>
-          <pre><code>URL:              https://ekocentrs.lv/kyc-sso.php
+          <pre><code>URL:              https://anketa.ekocentrs.lv/izveidot
 Piekļuves līmenis: Special (vai jūsu aģentu līmenis)</code></pre>
           <p>
-            Saite ved uz tiltu, nevis tieši uz anketu — tā aģents vienmēr iziet caur Joomla
-            pārbaudi. Piekļuves līmenis tikai paslēpj saiti no citiem; īsto pārbaudi veic
-            <code>kyc-sso.php</code>.
+            Piekļuves līmenis tikai paslēpj saiti no citiem vietnes apmeklētājiem — īsto
+            ierobežojumu uzliek 4. solis.
           </p>
           <div class="note">
-            <p><strong>Bez iframe.</strong> Aģenta lapa nedrīkst tikt iebūvēta rakstā kā
-            <code>&lt;iframe&gt;</code>: sesijas sīkdatne citā domēnā tiek uzskatīta par trešās
-            puses sīkdatni, un daļa pārlūku to bloķē. Klienta anketu (<code>/aizpildit</code>)
-            iframe-ā ielikt drīkst — tai autorizācija nav vajadzīga.</p>
+            <p><strong>Bez iframe.</strong> Aģentu lapu nevajag iebūvēt rakstā kā
+            <code>&lt;iframe&gt;</code>: daļa pārlūku bloķē trešās puses sīkdatnes, un lapa
+            uzvedīsies neparedzami. Klienta anketai iframe arī neder — visi darījuma dati ir
+            saites parametrā, un iframe iekšpusē tie nenonāk.</p>
           </div>
         </div>
       </div>
 
       <div class="stepblock">
         <div class="stepbody">
-          <h2>Koplietotais noslēpums</h2>
-          <p>Ģenerējiet uz servera 32 baitu nejaušu virkni:</p>
-          <pre><code>openssl rand -hex 32</code></pre>
+          <h2>Piekļuves ierobežojums <code>/izveidot</code> lapai</h2>
           <p>
-            To pašu vērtību ieraksta <code>kyc-sso.php</code> un nodod mums — mēs to ieliekam
-            lietotnes vidē kā <code>JOOMLA_SSO_SECRET</code>. Lūdzam nodot to caur paroļu pārvaldnieku
-            vai citu drošu kanālu, nevis e-pastā vai čatā. Ja noslēpums kādreiz nonāk nepareizās rokās —
-            ģenerējiet jaunu, nomainiet abās vietās, un vecie marķieri uzreiz pārstāj darboties.
+            Šo mēs atstājam jūsu ziņā — jūs vislabāk zināt, kas jau darbojas jūsu infrastruktūrā.
+            Lietotnes pusē neko konfigurēt nevajag: tā ir gatava strādāt aiz jebkāda ārēja
+            ierobežojuma un pati pieteikšanos neprasa.
+          </p>
+          <p>Trīs izplatītas iespējas, ja noder:</p>
+          <ul>
+            <li><strong>Cloudflare Access</strong> — bezmaksas līdz 50 lietotājiem, pieteikšanās ar
+              Google kontu, ierobežojumu var likt uz konkrētu ceļu.</li>
+            <li><strong>IP whitelist</strong> uz biroja tīklu — vienkāršākais, bet aģents nevar
+              strādāt no mājām vai no telefona.</li>
+            <li><strong>HTTP Basic Auth</strong> uz <code>location /izveidot</code> — viena parole
+              visiem aģentiem, uzstādāma nginx konfigurācijā divās rindās.</li>
+          </ul>
+          <p>
+            Ja jums ērtāk kaut kas cits — dariet, kā uzskatāt par pareizu. Vienīgais nosacījums ir
+            tas, kas aprakstīts lapas sākumā: ierobežojums attiecas tikai uz <code>/izveidot</code>,
+            un <code>/aizpildit</code> paliek publisks.
           </p>
         </div>
       </div>
@@ -495,11 +468,11 @@ Piekļuves līmenis: Special (vai jūsu aģentu līmenis)</code></pre>
         <div class="stepbody">
           <h2>Pārbaude</h2>
           <ul>
-            <li>Nepieteicies lietotājs atver izvēlnes saiti → redz Joomla login formu, pēc pieteikšanās nonāk anketā.</li>
-            <li>Pieteicies lietotājs <em>ārpus</em> aģentu grupas → tiek aizvests atpakaļ ar kļūdas paziņojumu.</li>
-            <li>Aģents atver <code>anketa.ekocentrs.lv/izveidot</code> tieši, bez sesijas → tiek pāradresēts uz Joomla.</li>
-            <li>Marķiera saite, atvērta vēlāk par 30 sekundēm → aģents tiek klusi aizvests atpakaļ uz Joomla pieteikties no jauna, nevis redz kļūdas lapu.</li>
-            <li>Klienta saite <code>/aizpildit?d=…</code> atveras anonīmi, arī citā pārlūkā un telefonā.</li>
+            <li>Aģents no biroja atver izvēlnes saiti → nokļūst saišu izveides lapā.</li>
+            <li>Nepiederoša persona atver <code>anketa.ekocentrs.lv/izveidot</code> → netiek iekšā.</li>
+            <li>Klienta saite <code>/aizpildit?d=…</code> atveras anonīmi — citā pārlūkā, telefonā,
+              bez VPN un bez konta.</li>
+            <li>Klients aizpilda anketu līdz galam un lejupielādē PDF.</li>
           </ul>
         </div>
       </div>
@@ -508,31 +481,21 @@ Piekļuves līmenis: Special (vai jūsu aģentu līmenis)</code></pre>
   </section>
 
   <section>
-    <h2>Ko mums vajag no jums</h2>
-    <ul class="checklist">
-      <li>Kurš variants — Vercel (A) vai jūsu serveris (B)?</li>
-      <li>Aģentu Joomla lietotāju grupas nosaukums un ID.</li>
-      <li>Koplietotais noslēpums (5. solis), nodots drošā kanālā.</li>
-      <li>PHP versija uz servera.</li>
-      <li>Apstiprinājums, ka subdomain <code>anketa.ekocentrs.lv</code> ir izveidots.</li>
+    <h2>Kad esat pabeidzis</h2>
+    <p>Mums pietiek ar divām lietām:</p>
+    <ul>
+      <li>apstiprinājums, ka <code>anketa.ekocentrs.lv</code> ir izveidots un norāda uz pareizo vietu;</li>
+      <li>īss apraksts, kā tieši <code>/izveidot</code> ir aizsargāts — lai mēs zinātu, ko teikt
+        aģentam, kad viņš pirmoreiz mēģinās ieiet.</li>
     </ul>
-  </section>
-
-  <section>
-    <h2>Piezīme par Joomla 3.10</h2>
     <p>
-      Joomla 3.10 atbalsts beidzās 2023. gada augustā — vietne vairs nesaņem drošības
-      atjauninājumus. Uz anketu tas neattiecas: tā ir atsevišķa lietotne uz sava subdomain ar savu
-      koda bāzi. Taču tilts no 3. soļa ir rakstīts Joomla 3 API (<code>JFactory</code>,
-      <code>JRoute</code>), un pēc migrācijas uz Joomla 4/5 tas būs jāpārraksta uz
-      <code>Joomla\CMS\Factory</code>. Ja migrācija ir plānota tuvākajā laikā, ir vērts vispirms
-      migrēt un tikai tad likt tiltu — tā šo darbu nevajadzēs darīt divreiz.
+      Ja rodas jautājumi vai kaut kas jūsu infrastruktūrā prasa citu pieeju — rakstiet,
+      pielāgosimies.
     </p>
   </section>
 
   <footer>
     <div>Ekocentrs Web Solutions · AML/KYC anketa</div>
-    <div>Jautājumi par lietotnes pusi — rakstiet mums; Joomla puses kods šajā dokumentā ir gatavs kopēšanai.</div>
   </footer>
 
 </div>

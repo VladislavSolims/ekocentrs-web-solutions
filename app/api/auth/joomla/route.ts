@@ -47,6 +47,12 @@ function loginFailedPage(reason: string): string {
 
 export async function GET(request: Request): Promise<Response> {
   const config = readAuthConfig();
+
+  // Nothing to hand off to: the login is happening in front of the app.
+  if (config.mode === "external") {
+    return new Response("Not found", { status: 404 });
+  }
+
   const url = new URL(request.url);
   const secure = url.protocol === "https:";
 

@@ -15,6 +15,7 @@ function requestWith(cookieValue?: string) {
 }
 
 beforeEach(() => {
+  vi.stubEnv("AGENT_LOGIN", "joomla");
   vi.stubEnv("JOOMLA_SSO_SECRET", "0123456789abcdef0123456789abcdef");
   vi.stubEnv("SESSION_SECRET", SESSION_SECRET);
   vi.stubEnv("JOOMLA_LOGIN_URL", LOGIN_URL);
@@ -56,5 +57,15 @@ describe("proxy guarding /izveidot", () => {
     const response = await proxy(requestWith(forged));
 
     expect(response.headers.get("location")).toBe(LOGIN_URL);
+  });
+});
+
+describe("proxy when the guard sits in front of the app", () => {
+  it("lets everyone through, because nothing else reaches it", async () => {
+    vi.stubEnv("AGENT_LOGIN", "external");
+
+    const response = await proxy(requestWith());
+
+    expect(response.headers.get("location")).toBeNull();
   });
 });

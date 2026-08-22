@@ -64,26 +64,33 @@ Joomla admin → Saturs → Raksti → atver vajadzīgo rakstu → HTML skats:
 ## 4. Piekļuves ierobežošana `/izveidot`
 
 Lapa `/izveidot` (aģenta saišu izveide) nav paredzēta klientiem — klients aizpilda anketu pa
-saiti `/aizpildit?d=...`, kurai autorizācija nav vajadzīga.
+saiti `/aizpildit?d=...`, kurai autorizācija nav vajadzīga un nekad nebūs.
 
-**Izvēlētais risinājums (vēl nav ieviests):** autorizācija ar esošajiem **Joomla lietotāju
-kontiem** — aģenti izmanto to pašu paroli, ar ko iet ekocentrs.lv, atsevišķs paroļu saraksts
-netiek veidots. Plānotā shēma:
+**Izvēlētā pieeja (2026-08-22): `AGENT_LOGIN=external`.** Ierobežojumu uzliek vietnes uzturētājs
+tā, kā viņai ērtāk — Cloudflare Access, IP whitelist vai HTTP Basic Auth uz `location /izveidot`.
+Lietotnes pusē neko konfigurēt nevajag: `proxy.ts` šajā režīmā laiž cauri visus, jo pieņem, ka
+neviens cits līdz tai nemaz netiek. Nosacījums viens: ierobežojums attiecas **tikai** uz ceļu
+`/izveidot`, nevis uz visu subdomain, citādi klienti nevar aizpildīt anketu.
 
-1. Aģents atver `anketa.ekocentrs.lv/izveidot` → nav sesijas → pāradresācija uz Joomla.
-2. Joomla pusē neliels tilts (plugin vai atsevišķs PHP ieejas punkts) pārbauda, vai lietotājs ir
-   pieteicies un vai viņš ir vajadzīgajā lietotāju grupā; ja nav — parāda parasto Joomla login formu.
-3. Pēc pieteikšanās Joomla pāradresē atpakaļ uz anketu ar īsdzīvojošu, ar koplietotu noslēpumu
-   parakstītu marķieri (HMAC-SHA256, derīgs 30 s, satur lietotāja ID, vārdu un e-pastu).
-4. Next.js pārbauda parakstu un uzliek savu `httpOnly` sesijas sīkdatni (8 h); `proxy.ts` sargā
-   `/izveidot`. Next.js 16 šis faila nosaukums ir `proxy.ts` — `middleware.ts` ir novecojušais
-   nosaukums tam pašam.
+Iemesls: nevajag apmainīties ar koplietotu noslēpumu un nevajag likt kodu vietnē. Cena: aģents
+piesakās nevis ar savu ekocentrs.lv paroli, bet ar to, ko izvēlas uzturētāja.
 
-Izmantotie marķieri netiek glabāti (lietotne apzināti ir bez datubāzes) — aizsardzība ir īsais
-30 sekunžu logs, un mūsu puse to piemēro pati, neuzticoties `exp` vērtībai, ko atsūta tilts.
+### Rezerves variants: `AGENT_LOGIN=joomla`
 
-**Pagaidu risinājums, kamēr tilts nav gatavs:** ierobežo piekļuvi infrastruktūras līmenī —
-Cloudflare Access (bezmaksas līdz 50 lietotājiem) vai nginx IP whitelist uz biroja tīklu.
+Kods pieteikšanai ar esošajiem Joomla kontiem ir uzrakstīts, notestēts un paliek repozitorijā —
+to ieslēdz, uzstādot `AGENT_LOGIN=joomla` un trīs mainīgos no `.env.example`. Tas noder, ja
+kādreiz gribas, lai aģenti ietu ar to pašu paroli, ar ko iet vietnē, vai citā aģentūrā, kur nav
+sava uzturētāja.
+
+Tam Joomla saknē jāievieto tilts `kyc-sso.php`: tas pārbauda, vai lietotājs ir pieteicies un vai
+ir vajadzīgajā grupā, un pāradresē uz `/api/auth/joomla` ar 30 sekundes derīgu, ar HMAC-SHA256
+parakstītu marķieri (`base64url(JSON).paraksts`; lauki sub/name/email/iat/exp). Mūsu puse
+pārbauda parakstu nemainīgā laikā, piemēro 30 sekunžu ierobežojumu pati (neuzticoties `exp`) un
+apmaina marķieri pret savu `httpOnly` sesijas sīkdatni uz 8 stundām. Izlietotie marķieri netiek
+glabāti — lietotne apzināti ir bez datubāzes.
+
+Tilta PHP kods bija aprakstīts šī dokumenta 2026-08-22 versijā; to var atjaunot no git vēstures
+(`git log -- docs/integracija-handoff.html`).
 
 ## Piezīme par Joomla 3
 

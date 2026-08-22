@@ -214,14 +214,15 @@
     <p class="standfirst">
       Семь шагов, которые проходит документ, и что в каждый момент делает сервер.
       Главное, что стоит удерживать в голове: сервер участвует ровно три раза, а между
-      этими моментами всё живёт в браузере и в самой ссылке.
+      этими моментами всё живёт в браузере и в самой ссылке. Причём первый из трёх раз —
+      это даже не наше приложение, а преграда перед ним.
     </p>
   </header>
 
   <section>
     <div class="fig-scroll">
       <figure>
-        <svg viewBox="0 0 1000 300" role="img" aria-label="Семь фаз работы с анкетой. Браузер задействован во всех семи, сервер — только в трёх: обмен токена, рендер страницы клиента и генерация PDF. Хранилище пустое на протяжении всего маршрута.">
+        <svg viewBox="0 0 1000 300" role="img" aria-label="Семь фаз работы с анкетой. Браузер задействован во всех семи, сервер — только в трёх: проверка доступа перед приложением, рендер страницы клиента и генерация PDF. Хранилище пустое на протяжении всего маршрута.">
           <defs>
             <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
               <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
@@ -256,8 +257,8 @@
           <!-- server lane: only three touches -->
           <line x1="140" y1="152" x2="984" y2="152" stroke="currentColor" stroke-width="1" stroke-dasharray="3 5" opacity="0.28"/>
           <rect x="140" y="132" width="112" height="40" rx="5" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>
-          <text x="196" y="148" text-anchor="middle" font-size="10.5" fill="var(--accent)">обмен</text>
-          <text x="196" y="162" text-anchor="middle" font-size="10.5" fill="var(--accent)">токена</text>
+          <text x="196" y="148" text-anchor="middle" font-size="10.5" fill="var(--accent)">пропуск</text>
+          <text x="196" y="162" text-anchor="middle" font-size="10.5" fill="var(--accent)">проверен</text>
 
           <rect x="384" y="132" width="112" height="40" rx="5" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>
           <text x="440" y="148" text-anchor="middle" font-size="10.5" fill="var(--accent)">разбор ссылки,</text>
@@ -289,8 +290,25 @@
       <div class="phase-body">
         <h2>Агент входит</h2>
         <p>
-          Агент открывает на ekocentrs.lv пункт меню «Анкета». Дальше происходит рукопожатие
-          между тремя сторонами, в котором пароль видит только Joomla.
+          Агент открывает на ekocentrs.lv пункт меню «Анкета» и попадает на страницу создания
+          ссылки. Кто именно туда допущен, решает не приложение: доступ к <code>/izveidot</code>
+          закрыт снаружи, на стороне сайта — это может быть Cloudflare Access, список IP-адресов
+          офиса или пароль на уровне веб-сервера. Приложение исходит из того, что до него доходят
+          только те, кто эту преграду уже прошёл.
+        </p>
+        <p>
+          Настройка <code>AGENT_LOGIN</code> задаёт режим явно, и значения по умолчанию у неё нет:
+          если её забыть, приложение откажется отдавать страницу, вместо того чтобы молча открыть
+          её всем.
+        </p>
+
+        <h3>Второй режим, если понадобится вход паролем от сайта</h3>
+        <p>
+          В коде есть и другой способ, готовый и покрытый тестами: агент входит тем же паролем,
+          что и на ekocentrs.lv. Включается настройкой <code>AGENT_LOGIN=joomla</code>. Он
+          требует, чтобы на сайте стоял небольшой файл-мост и чтобы стороны обменялись общим
+          ключом, — поэтому сейчас не используется, но пригодится в агентстве, где нет своего
+          вебмастера.
         </p>
 
         <div class="fig-scroll">
@@ -347,8 +365,9 @@
               <text x="396" y="308" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.7">Joomla больше не участвует, пока кука жива</text>
             </svg>
             <figcaption>
-              Пароль агента остаётся внутри Joomla. Приложение получает только подписанное
-              утверждение «это пользователь №42, и он в группе агентов», годное 30 секунд.
+              Так работает режим <code>joomla</code>: пароль агента остаётся внутри Joomla, а
+              приложение получает только подписанное утверждение «это пользователь №42, и он в
+              группе агентов», годное 30 секунд.
             </figcaption>
           </figure>
         </div>
@@ -356,15 +375,11 @@
         <div class="split">
           <div class="pane">
             <h3>Что видит человек</h3>
-            <p>Клик по пункту меню, при необходимости — обычная форма входа Joomla. Дальше сразу страница создания ссылки.</p>
+            <p>Клик по пункту меню и, в зависимости от того, что настроит вебмастер, — вход через Google или ничего вообще, если он уже в офисной сети.</p>
           </div>
           <div class="pane server">
             <h3>Что делает сервер</h3>
-            <ul>
-              <li><code>proxy.ts</code> ловит заход на <code>/izveidot</code> и проверяет куку</li>
-              <li><code>/api/auth/joomla</code> сверяет подпись токена и выдаёт сессию</li>
-              <li>протухший токен → молча обратно в Joomla, ровно один раз</li>
-            </ul>
+            <p>В режиме <code>external</code> — пропускает. Проверка уже произошла до него.</p>
           </div>
         </div>
       </div>
@@ -587,9 +602,9 @@
       <table>
         <thead><tr><th>Фаза</th><th>Файл</th></tr></thead>
         <tbody>
-          <tr><td>Защита страницы агента</td><td class="file">proxy.ts</td></tr>
-          <tr><td>Обмен токена на сессию</td><td class="file">app/api/auth/joomla/route.ts</td></tr>
-          <tr><td>Проверка токена и куки</td><td class="file">lib/joomlaToken.ts, lib/session.ts</td></tr>
+          <tr><td>Режим защиты страницы агента</td><td class="file">config/auth.ts, proxy.ts</td></tr>
+          <tr><td>Вход паролем от сайта (режим joomla)</td><td class="file">app/api/auth/joomla/route.ts</td></tr>
+          <tr><td>Проверка токена и куки (режим joomla)</td><td class="file">lib/joomlaToken.ts, lib/session.ts</td></tr>
           <tr><td>Создание ссылки</td><td class="file">app/izveidot/page.tsx</td></tr>
           <tr><td>Упаковка данных в ссылку</td><td class="file">lib/linkPayload.ts</td></tr>
           <tr><td>Разбор ссылки клиента</td><td class="file">app/aizpildit/page.tsx</td></tr>

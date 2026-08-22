@@ -65,23 +65,27 @@ Joomla pusē veicamajām darbībām — ir failā [`docs/INTEGRACIJA.md`](docs/I
 
 ### Aģenta pieteikšanās
 
-Piekļuve lapai `/izveidot` ir ierobežota ar **esošajiem Joomla lietotāju kontiem** — aģents
-piesakās ar to pašu paroli, ar ko iet ekocentrs.lv; atsevišķs paroļu saraksts netiek veidots.
-Klienta lapa `/aizpildit?d=...` paliek publiska (klientam konts nav vajadzīgs).
+Piekļuvi lapai `/izveidot` nosaka mainīgais `AGENT_LOGIN` — noklusējuma vērtības nav, jo
+uzminēšana varētu atstāt lapu vaļā:
 
-Joomla puses tilts izsniedz 30 sekundes derīgu, ar HMAC-SHA256 parakstītu marķieri;
-`app/api/auth/joomla` to pārbauda un apmaina pret savu `httpOnly` sesijas sīkdatni (8 h), un
-`proxy.ts` neielaiž `/izveidot` bez tās. Paroles lietotne neredz un neglabā; izlietotie marķieri
-netiek glabāti — aizsardzība ir īsais derīguma logs. Joomla pusē veicamais (kopā ar gatavu PHP
-kodu) — `docs/INTEGRACIJA.md` un `docs/integracija-handoff.html`.
+- **`external`** (pašreizējā izvēle) — ierobežojumu uzliek vietnes uzturētājs pirms lietotnes
+  (Cloudflare Access, IP whitelist, HTTP Basic Auth). `proxy.ts` šajā režīmā laiž cauri visus,
+  jo pieņem, ka neviens cits līdz tai netiek. Nosacījums: ierobežojums attiecas tikai uz
+  `/izveidot`, nevis uz visu subdomain.
+- **`joomla`** — lietotne pati pārbauda parakstītu marķieri no ekocentrs.lv, un aģents piesakās
+  ar savu Joomla paroli. Prasa `JOOMLA_SSO_SECRET`, `SESSION_SECRET`, `JOOMLA_LOGIN_URL` un
+  tiltu `kyc-sso.php` vietnes pusē. Kods ir gatavs un notestēts; sk. `docs/INTEGRACIJA.md`.
 
-Vajadzīgie vides mainīgie ir aprakstīti `.env.example`. Izstrādei nokopē to uz `.env.local`;
-E2E testiem vērtības nāk no `e2e/testAuth.ts`.
+Klienta lapa `/aizpildit?d=...` abos režīmos paliek publiska — klientam konta nav un nebūs.
+
+Vides mainīgie — `.env.example`. Izstrādei nokopē to uz `.env.local`; E2E testiem vērtības nāk
+no `e2e/testAuth.ts` (tie pārbauda `joomla` režīmu, `external` sedz unit testi).
 
 ## Zināmie ierobežojumi (apzināti, v1 darba kārtībā)
 
-- Projekts vēl nav izvietots (deploy) — pašlaik darbojas tikai lokāli, un Joomla puses tilts
-  vēl nav uzlikts vietnē.
-- Sesija darbojas 8 stundas un netiek atsaukta no ārpuses: ja aģentam atņem Joomla kontu, viņa
-  jau izsniegtā sīkdatne paliek derīga līdz termiņa beigām.
+- Projekts vēl nav izvietots (deploy) — pašlaik darbojas tikai lokāli.
+- `external` režīmā lietotne pati nezina, kurš aģents to lieto: tā uzticas tam, kas stāv priekšā.
+  Ja tas ir nepareizi nokonfigurēts, lapa ir vaļā, un lietotne to nepamanīs.
+- `joomla` režīmā sesija darbojas 8 stundas un netiek atsaukta no ārpuses: ja aģentam atņem
+  Joomla kontu, viņa jau izsniegtā sīkdatne paliek derīga līdz termiņa beigām.
 - Nav servera puses datu glabāšanas — aģentam pašam jāarhivē lejupielādētie PDF atbilstoši AML likuma glabāšanas termiņiem.

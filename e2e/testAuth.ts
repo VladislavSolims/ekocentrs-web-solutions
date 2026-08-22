@@ -6,6 +6,8 @@ import type { Page } from "@playwright/test";
  * playwright.config.ts) and in .env.local for local development. Real values
  * live in the deployment environment — see .env.example.
  */
+/** The E2E suite exercises the Joomla hand-off; external mode is covered by unit tests. */
+export const E2E_AGENT_LOGIN = "joomla";
 export const E2E_JOOMLA_SECRET = "e2e-joomla-sso-secret-0123456789abcdef";
 export const E2E_SESSION_SECRET = "e2e-session-secret-fedcba9876543210ab";
 export const E2E_JOOMLA_LOGIN_URL = "http://localhost:3000/joomla-login-stub";
