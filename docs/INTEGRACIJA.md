@@ -74,9 +74,13 @@ netiek veidots. Plānotā shēma:
 2. Joomla pusē neliels tilts (plugin vai atsevišķs PHP ieejas punkts) pārbauda, vai lietotājs ir
    pieteicies un vai viņš ir vajadzīgajā lietotāju grupā; ja nav — parāda parasto Joomla login formu.
 3. Pēc pieteikšanās Joomla pāradresē atpakaļ uz anketu ar īsdzīvojošu, ar koplietotu noslēpumu
-   parakstītu marķieri (HMAC/JWT, derīgs ~60 s, satur lietotāja ID un grupu).
-4. Next.js pārbauda parakstu un uzliek savu `httpOnly` sesijas sīkdatni; `middleware.ts` sargā
-   `/izveidot`.
+   parakstītu marķieri (HMAC-SHA256, derīgs 30 s, satur lietotāja ID, vārdu un e-pastu).
+4. Next.js pārbauda parakstu un uzliek savu `httpOnly` sesijas sīkdatni (8 h); `proxy.ts` sargā
+   `/izveidot`. Next.js 16 šis faila nosaukums ir `proxy.ts` — `middleware.ts` ir novecojušais
+   nosaukums tam pašam.
+
+Izmantotie marķieri netiek glabāti (lietotne apzināti ir bez datubāzes) — aizsardzība ir īsais
+30 sekunžu logs, un mūsu puse to piemēro pati, neuzticoties `exp` vērtībai, ko atsūta tilts.
 
 **Pagaidu risinājums, kamēr tilts nav gatavs:** ierobežo piekļuvi infrastruktūras līmenī —
 Cloudflare Access (bezmaksas līdz 50 lietotājiem) vai nginx IP whitelist uz biroja tīklu.

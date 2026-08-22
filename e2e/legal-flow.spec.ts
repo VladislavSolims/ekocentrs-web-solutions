@@ -1,10 +1,11 @@
 import { test, expect } from "@playwright/test";
+import { loginAsAgent } from "./testAuth";
 import fs from "node:fs/promises";
 import { PDFParse } from "pdf-parse";
 
 test("legal entity client fills out the questionnaire and downloads a PDF", async ({ page }) => {
   // 1. Agent creates a link for the client
-  await page.goto("/izveidot");
+  await loginAsAgent(page);
   await page.getByLabel("Firma", { exact: true }).selectOption({ label: 'SIA "SUN RAIN"' });
   await page.getByLabel("Klienta tips", { exact: true }).selectOption({ label: "Juridiska persona" });
   await page.getByLabel("Adrese", { exact: true }).fill("Dārzciema iela 5, Rīga");

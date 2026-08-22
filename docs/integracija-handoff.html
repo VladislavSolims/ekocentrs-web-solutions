@@ -300,7 +300,7 @@
         </thead>
         <tbody>
           <tr><td>Anketas lietotne, PDF ģenerēšana, saišu izveide</td><td class="who">Mēs — gatavs</td></tr>
-          <tr><td>Marķiera pārbaude lietotnes pusē, sesijas sīkdatne, <code>/izveidot</code> aizsardzība</td><td class="who">Mēs — izstrādē</td></tr>
+          <tr><td>Marķiera pārbaude lietotnes pusē, sesijas sīkdatne, <code>/izveidot</code> aizsardzība</td><td class="who">Mēs — gatavs</td></tr>
           <tr><td>Lietotnes izvietošana (deploy) un TLS sertifikāts</td><td class="who">Mēs vai jūs — sk. 1. soli</td></tr>
           <tr><td>DNS ieraksts subdomain-am</td><td class="who">Jūs</td></tr>
           <tr><td>Autorizācijas tilts Joomla pusē</td><td class="who">Jūs</td></tr>
@@ -324,7 +324,7 @@
              │  Joomla pārbauda: vai pieteicies? vai pareizajā grupā?
              │  ja nav pieteicies → parastā Joomla login forma
              ▼
-        pāradresācija atpakaļ ar marķieri (derīgs 60 s, parakstīts ar HMAC)
+        pāradresācija atpakaļ ar marķieri (derīgs 30 s, parakstīts ar HMAC)
              ▼
      anketa.ekocentrs.lv/api/auth/joomla
              │  pārbauda parakstu → uzliek httpOnly sesijas sīkdatni
@@ -426,13 +426,13 @@ if (!in_array($groupId, $user-&gt;getAuthorisedGroups())) {
     $app-&gt;redirect(JRoute::_(<span class="st">'index.php'</span>, false));
 }
 
-<span class="cm">// Viss kārtībā → izsniedz marķieri, derīgu 60 sekundes.</span>
+<span class="cm">// Viss kārtībā → izsniedz marķieri, derīgu 30 sekundes.</span>
 $payload = json_encode([
     <span class="st">'sub'</span>   =&gt; (int) $user-&gt;id,
     <span class="st">'name'</span>  =&gt; $user-&gt;name,
     <span class="st">'email'</span> =&gt; $user-&gt;email,
     <span class="st">'iat'</span>   =&gt; time(),
-    <span class="st">'exp'</span>   =&gt; time() + 60,
+    <span class="st">'exp'</span>   =&gt; time() + 30,
     <span class="st">'jti'</span>   =&gt; bin2hex(random_bytes(16)),
 ], JSON_UNESCAPED_UNICODE);
 
@@ -441,9 +441,11 @@ $sig   = hash_hmac(<span class="st">'sha256'</span>, $body, $secret);
 
 $app-&gt;redirect($appUrl . <span class="st">'/api/auth/joomla?token='</span> . urlencode($body . <span class="st">'.'</span> . $sig));</code></pre>
           <p>
-            Marķieris ir <code>base64url(JSON) + "." + HMAC-SHA256</code>. Mūsu pusē tas tiek
-            pārbaudīts ar <code>hash_equals</code>, tiek pārbaudīts <code>exp</code>, un
-            <code>jti</code> tiek iegaumēts, lai vienu marķieri nevarētu izmantot divreiz.
+            Marķieris ir <code>base64url(JSON) + "." + HMAC-SHA256</code>. Mūsu pusē paraksts tiek
+            salīdzināts nemainīgā laikā, un derīguma termiņu mēs piemērojam paši — ne ilgāk par
+            30 sekundēm no <code>iat</code>, neatkarīgi no tā, ko prasa <code>exp</code>. Lietotne
+            apzināti darbojas bez datubāzes, tāpēc izlietotie marķieri netiek glabāti; aizsardzība
+            ir īsais logs un HTTPS.
           </p>
           <div class="note">
             <p><strong>Nepieciešams PHP 7.0+</strong> — <code>random_bytes()</code> dēļ. Joomla 3.10
@@ -496,7 +498,7 @@ Piekļuves līmenis: Special (vai jūsu aģentu līmenis)</code></pre>
             <li>Nepieteicies lietotājs atver izvēlnes saiti → redz Joomla login formu, pēc pieteikšanās nonāk anketā.</li>
             <li>Pieteicies lietotājs <em>ārpus</em> aģentu grupas → tiek aizvests atpakaļ ar kļūdas paziņojumu.</li>
             <li>Aģents atver <code>anketa.ekocentrs.lv/izveidot</code> tieši, bez sesijas → tiek pāradresēts uz Joomla.</li>
-            <li>Vienas un tās pašas marķiera saites atvēršana otrreiz → tiek noraidīta.</li>
+            <li>Marķiera saite, atvērta vēlāk par 30 sekundēm → aģents tiek klusi aizvests atpakaļ uz Joomla pieteikties no jauna, nevis redz kļūdas lapu.</li>
             <li>Klienta saite <code>/aizpildit?d=…</code> atveras anonīmi, arī citā pārlūkā un telefonā.</li>
           </ul>
         </div>

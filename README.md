@@ -22,9 +22,10 @@ Sistēma neglabā neko serverī — visi aģenta izvēlētie dati ir iekodēti p
 
 ```
 app/
-  izveidot/          aģenta lapa — saites/QR koda izveide
+  izveidot/          aģenta lapa — saites/QR koda izveide (prasa pieteikšanos)
   aizpildit/          klienta wizard + dokumenta priekšskats
   api/generate-pdf/   PDF ģenerēšanas route
+  api/auth/joomla/    Joomla marķiera apmaiņa pret sesiju
 components/
   wizard/             FieldRenderer, StepRenderer, Wizard
   document/           DocumentTemplate (priekšskats ekrānā)
@@ -34,6 +35,10 @@ schemas/
 lib/
   linkPayload.ts      saites kodēšana/dekodēšana
   renderDocumentHtml.ts  dokumenta HTML PDF ģenerēšanai
+  hmacToken.ts        marķieru parakstīšana/pārbaude (kopīga ar Joomla pusi)
+  joomlaToken.ts      Joomla izsniegtā marķiera pārbaude
+  session.ts          aģenta sesijas sīkdatne
+proxy.ts              sargā /izveidot (Next.js 16 nosaukums; agrāk middleware.ts)
 config/companies.ts   SIA EKOCENTRS / SIA SUN RAIN rekvizīti
 reference/            oriģinālās .docx anketas (avota dokumenti)
 e2e/                  Playwright E2E testi
@@ -58,14 +63,25 @@ uz kuru ved saite no ekocentrs.lv (Joomla 3.10.10). Pilns apraksts — soli pa s
 Joomla pusē veicamajām darbībām — ir failā [`docs/INTEGRACIJA.md`](docs/INTEGRACIJA.md)
 (nosūtāmā PDF versija: `docs/INTEGRACIJA.pdf`).
 
-Piekļuve lapai `/izveidot` tiks ierobežota ar **esošajiem Joomla lietotāju kontiem** — aģents
+### Aģenta pieteikšanās
+
+Piekļuve lapai `/izveidot` ir ierobežota ar **esošajiem Joomla lietotāju kontiem** — aģents
 piesakās ar to pašu paroli, ar ko iet ekocentrs.lv; atsevišķs paroļu saraksts netiek veidots.
-Klienta lapa `/aizpildit?d=...` paliek publiska (klientam konts nav vajadzīgs). Tehniskā shēma —
-`docs/INTEGRACIJA.md`, 4. punkts.
+Klienta lapa `/aizpildit?d=...` paliek publiska (klientam konts nav vajadzīgs).
+
+Joomla puses tilts izsniedz 30 sekundes derīgu, ar HMAC-SHA256 parakstītu marķieri;
+`app/api/auth/joomla` to pārbauda un apmaina pret savu `httpOnly` sesijas sīkdatni (8 h), un
+`proxy.ts` neielaiž `/izveidot` bez tās. Paroles lietotne neredz un neglabā; izlietotie marķieri
+netiek glabāti — aizsardzība ir īsais derīguma logs. Joomla pusē veicamais (kopā ar gatavu PHP
+kodu) — `docs/INTEGRACIJA.md` un `docs/integracija-handoff.html`.
+
+Vajadzīgie vides mainīgie ir aprakstīti `.env.example`. Izstrādei nokopē to uz `.env.local`;
+E2E testiem vērtības nāk no `e2e/testAuth.ts`.
 
 ## Zināmie ierobežojumi (apzināti, v1 darba kārtībā)
 
-- `/izveidot` lapai vēl nav autorizācijas — jebkurš ar piekļuvi lietotnei var izveidot anketas
-  saiti. Risinājums izvēlēts, bet vēl nav ieviests (sk. sadaļu augstāk).
-- Projekts vēl nav izvietots (deploy) — pašlaik darbojas tikai lokāli.
+- Projekts vēl nav izvietots (deploy) — pašlaik darbojas tikai lokāli, un Joomla puses tilts
+  vēl nav uzlikts vietnē.
+- Sesija darbojas 8 stundas un netiek atsaukta no ārpuses: ja aģentam atņem Joomla kontu, viņa
+  jau izsniegtā sīkdatne paliek derīga līdz termiņa beigām.
 - Nav servera puses datu glabāšanas — aģentam pašam jāarhivē lejupielādētie PDF atbilstoši AML likuma glabāšanas termiņiem.
