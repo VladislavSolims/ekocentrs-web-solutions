@@ -1,0 +1,536 @@
+<title>Anketas integrācija ekocentrs.lv</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+  :root {
+    --paper: #fbfcfa;
+    --surface: #f2f5f1;
+    --ink: #14201c;
+    --muted: #5c6a63;
+    --line: #dbe2dc;
+    --accent: #2f6d4f;
+    --accent-soft: #e6efe8;
+    --warn: #8a5316;
+    --warn-soft: #f7efe2;
+    --code-bg: #101a16;
+    --code-ink: #dce7de;
+
+    --step: clamp(1.05rem, 0.98rem + 0.3vw, 1.15rem);
+    --measure: 68ch;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0e1613;
+      --surface: #16211d;
+      --ink: #e4ece5;
+      --muted: #97a79e;
+      --line: #26332d;
+      --accent: #6bb98c;
+      --accent-soft: #182a21;
+      --warn: #d9a45f;
+      --warn-soft: #241d12;
+      --code-bg: #060d0a;
+      --code-ink: #d3e0d6;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0e1613;
+    --surface: #16211d;
+    --ink: #e4ece5;
+    --muted: #97a79e;
+    --line: #26332d;
+    --accent: #6bb98c;
+    --accent-soft: #182a21;
+    --warn: #d9a45f;
+    --warn-soft: #241d12;
+    --code-bg: #060d0a;
+    --code-ink: #d3e0d6;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: var(--step);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 54rem;
+    margin: 0 auto;
+    padding: clamp(2rem, 1rem + 4vw, 4.5rem) clamp(1.1rem, 0.6rem + 2.4vw, 2.5rem) 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3.25rem;
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead { display: flex; flex-direction: column; gap: 1.1rem; }
+  .eyebrow {
+    font-size: 0.74rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  h1 {
+    font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+    font-weight: 600;
+    font-size: clamp(2rem, 1.4rem + 2.6vw, 3.1rem);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+    margin: 0;
+  }
+  .standfirst {
+    max-width: var(--measure);
+    color: var(--muted);
+    font-size: 1.08em;
+    margin: 0;
+  }
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 0.9rem 1.6rem;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 1.1rem 0;
+    margin-top: 0.4rem;
+  }
+  .fact { display: flex; flex-direction: column; gap: 0.15rem; }
+  .fact dt {
+    font-size: 0.7rem;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .fact dd {
+    margin: 0;
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.9rem;
+  }
+
+  /* ---------- generic blocks ---------- */
+  section { display: flex; flex-direction: column; gap: 1rem; }
+  h2 {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-weight: 600;
+    font-size: clamp(1.35rem, 1.15rem + 0.8vw, 1.7rem);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0;
+  }
+  h3 {
+    font-size: 0.98rem;
+    font-weight: 600;
+    margin: 0.5rem 0 0;
+    letter-spacing: 0.005em;
+  }
+  p { margin: 0; max-width: var(--measure); }
+  a { color: var(--accent); text-underline-offset: 0.18em; }
+  a:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  ul, ol { margin: 0; padding-left: 1.25rem; max-width: var(--measure); display: flex; flex-direction: column; gap: 0.45rem; }
+  li::marker { color: var(--muted); }
+  code {
+    font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    font-size: 0.88em;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 0.08em 0.32em;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 6px;
+    padding: 1.1rem 1.25rem;
+    overflow-x: auto;
+    margin: 0;
+    font-size: 0.83rem;
+    line-height: 1.6;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: inherit;
+    color: inherit;
+  }
+  .cm { color: #7f9c8b; }
+  .st { color: #c3d8a8; }
+
+  /* ---------- summary card ---------- */
+  .summary {
+    background: var(--accent-soft);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1.4rem 1.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+  .summary h2 { font-size: 1.15rem; }
+  .summary ol { gap: 0.3rem; }
+
+  /* ---------- split table ---------- */
+  .table-scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 34rem; font-size: 0.94rem; }
+  th, td { text-align: left; padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  thead th {
+    font-size: 0.7rem;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--ink);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td.who { white-space: nowrap; font-weight: 500; }
+
+  /* ---------- steps ---------- */
+  .steps { display: flex; flex-direction: column; gap: 2.5rem; counter-reset: step; }
+  .stepblock { display: grid; grid-template-columns: 2.6rem 1fr; gap: 0 1.1rem; align-items: start; }
+  .stepblock > * { grid-column: 2; }
+  .stepblock::before {
+    counter-increment: step;
+    content: counter(step);
+    grid-column: 1;
+    grid-row: 1 / span 99;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--accent);
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: 50%;
+    width: 2.1rem;
+    height: 2.1rem;
+    display: grid;
+    place-items: center;
+    margin-top: 0.15rem;
+  }
+  .stepbody { display: flex; flex-direction: column; gap: 0.85rem; }
+  .stepblock h2 { font-size: clamp(1.15rem, 1.05rem + 0.45vw, 1.35rem); }
+
+  /* ---------- callouts ---------- */
+  .note {
+    border-left: 3px solid var(--warn);
+    background: var(--warn-soft);
+    padding: 0.9rem 1.1rem;
+    border-radius: 0 5px 5px 0;
+    font-size: 0.95rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .note strong { color: var(--warn); }
+  .note p { max-width: none; }
+
+  /* ---------- checklist ---------- */
+  .checklist { list-style: none; padding: 0; gap: 0.75rem; max-width: var(--measure); }
+  .checklist li {
+    display: grid;
+    grid-template-columns: 1.15rem 1fr;
+    gap: 0.75rem;
+    align-items: start;
+  }
+  .checklist li::before {
+    content: "";
+    width: 1.05rem;
+    height: 1.05rem;
+    border: 1.5px solid var(--muted);
+    border-radius: 3px;
+    margin-top: 0.35rem;
+  }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 1.4rem;
+    color: var(--muted);
+    font-size: 0.87rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="eyebrow">Tehniskā specifikācija · nodošana vietnes uzturētājam</div>
+    <h1>Anketas integrācija ekocentrs.lv vietnē</h1>
+    <p class="standfirst">
+      AML/KYC klienta identifikācijas anketa ir patstāvīga Next.js lietotne. Tā netiek instalēta
+      Joomla iekšienē — tā darbojas uz sava subdomain, un no vietnes uz to ved saite.
+      Šis dokuments apraksta visu, kas jādara Joomla pusē.
+    </p>
+    <dl class="facts">
+      <div class="fact"><dt>Vietne</dt><dd>Joomla 3.10.10</dd></div>
+      <div class="fact"><dt>Lietotne</dt><dd>Next.js 16 / Node</dd></div>
+      <div class="fact"><dt>Subdomain</dt><dd>anketa.ekocentrs.lv</dd></div>
+      <div class="fact"><dt>Joomla koda izmaiņas</dt><dd>1 fails</dd></div>
+    </dl>
+  </header>
+
+  <section class="summary">
+    <h2>Īsumā</h2>
+    <ol>
+      <li>Anketa tiek izvietota uz <code>anketa.ekocentrs.lv</code> (Vercel vai jūsu serveris).</li>
+      <li>Joomla saknē tiek pievienots viens PHP fails — autorizācijas tilts.</li>
+      <li>Joomla izvēlnē parādās saite uz šo failu; tā ir redzama tikai aģentu lietotāju grupai.</li>
+      <li>Klientam nekas nav jāreģistrē — viņš aizpilda anketu pa saiti, ko atsūta aģents.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Kas ko dara</h2>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Uzdevums</th><th>Izpildītājs</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Anketas lietotne, PDF ģenerēšana, saišu izveide</td><td class="who">Mēs — gatavs</td></tr>
+          <tr><td>Marķiera pārbaude lietotnes pusē, sesijas sīkdatne, <code>/izveidot</code> aizsardzība</td><td class="who">Mēs — izstrādē</td></tr>
+          <tr><td>Lietotnes izvietošana (deploy) un TLS sertifikāts</td><td class="who">Mēs vai jūs — sk. 1. soli</td></tr>
+          <tr><td>DNS ieraksts subdomain-am</td><td class="who">Jūs</td></tr>
+          <tr><td>Autorizācijas tilts Joomla pusē</td><td class="who">Jūs</td></tr>
+          <tr><td>Izvēlnes elements un piekļuves līmenis</td><td class="who">Jūs</td></tr>
+          <tr><td>Koplietotais noslēpums (secret) un aģentu lietotāju grupa</td><td class="who">Jūs → mums</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Darbības principa shēma</h2>
+    <p>
+      Joomla paliek vienīgā vieta, kur glabājas aģentu paroles. Anketas lietotne pati paroles
+      nepārbauda un nesaglabā — tā uzticas īsdzīvojošam, parakstītam marķierim, ko izsniedz Joomla.
+    </p>
+    <pre><code>Aģents → anketa.ekocentrs.lv/izveidot
+             │  nav sesijas
+             ▼
+        ekocentrs.lv/kyc-sso.php
+             │  Joomla pārbauda: vai pieteicies? vai pareizajā grupā?
+             │  ja nav pieteicies → parastā Joomla login forma
+             ▼
+        pāradresācija atpakaļ ar marķieri (derīgs 60 s, parakstīts ar HMAC)
+             ▼
+     anketa.ekocentrs.lv/api/auth/joomla
+             │  pārbauda parakstu → uzliek httpOnly sesijas sīkdatni
+             ▼
+          /izveidot  — aģents izveido saiti klientam
+
+Klients → /aizpildit?d=…   (publiska lapa, autorizācija nav vajadzīga)</code></pre>
+  </section>
+
+  <section>
+    <h2>Ieviešanas soļi</h2>
+
+    <div class="steps">
+
+      <div class="stepblock">
+        <div class="stepbody">
+          <h2>Lietotnes izvietošana</h2>
+          <p>Divas iespējas — izvēlieties to, kas jums ērtāka; abas mums der.</p>
+          <h3>A. Vercel (bezmaksas, ātrākais)</h3>
+          <p>Lietotni izvietojam mēs, jums paliek tikai DNS ieraksts no 2. soļa.</p>
+          <h3>B. Jūsu serveris</h3>
+          <p>Nepieciešams Node.js 20+ un reverse proxy. Lietotne klausās uz porta 3000:</p>
+          <pre><code>npm ci
+npm run build
+npm start          <span class="cm"># ports 3000</span></code></pre>
+          <p>Piemēra nginx bloks:</p>
+          <pre><code>server {
+    server_name anketa.ekocentrs.lv;
+    location / {
+        proxy_pass         http://127.0.0.1:3000;
+        proxy_set_header   Host $host;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+    }
+}</code></pre>
+          <div class="note">
+            <p><strong>Svarīgi:</strong> PDF ģenerēšanai lietotne palaiž headless Chromium.
+            Uz sava servera tam vajadzīgas sistēmas bibliotēkas (<code>libnss3</code>,
+            <code>libatk-bridge2.0-0</code>, <code>libdrm2</code>, <code>libgbm1</code>,
+            <code>libasound2</code>) un ~1&nbsp;GB brīvas RAM. Uz Vercel tas darbojas bez papildu
+            darbībām — tāpēc iesakām variantu A.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="stepblock">
+        <div class="stepbody">
+          <h2>DNS ieraksts</h2>
+          <p>Pievienojiet subdomain <code>anketa.ekocentrs.lv</code>:</p>
+          <pre><code><span class="cm"># Variants A — Vercel</span>
+anketa   CNAME   cname.vercel-dns.com.
+
+<span class="cm"># Variants B — jūsu serveris</span>
+anketa   A       &lt;servera IP&gt;</code></pre>
+          <p>TLS sertifikāts obligāts — bez HTTPS sesijas sīkdatne nestrādās.</p>
+        </div>
+      </div>
+
+      <div class="stepblock">
+        <div class="stepbody">
+          <h2>Autorizācijas tilts Joomla pusē</h2>
+          <p>
+            Izveidojiet failu <code>kyc-sso.php</code> Joomla saknes direktorijā (blakus
+            <code>index.php</code>). Tas ir vienīgais jaunais kods vietnē — Joomla kodols un
+            paplašinājumi netiek aiztikti.
+          </p>
+          <pre><code>&lt;?php
+<span class="cm">/**
+ * kyc-sso.php — tilts starp Joomla sesiju un anketas lietotni.
+ * Ievieto Joomla saknes direktorijā.
+ */</span>
+define(<span class="st">'_JEXEC'</span>, 1);
+define(<span class="st">'JPATH_BASE'</span>, __DIR__);
+
+require_once JPATH_BASE . <span class="st">'/includes/defines.php'</span>;
+require_once JPATH_BASE . <span class="st">'/includes/framework.php'</span>;
+
+<span class="cm">// --- konfigurācija -------------------------------------------------</span>
+$secret  = <span class="st">'&lt;KOPLIETOTAIS_NOSLĒPUMS&gt;'</span>;   <span class="cm">// sk. 5. soli</span>
+$appUrl  = <span class="st">'https://anketa.ekocentrs.lv'</span>;
+$groupId = 10;                            <span class="cm">// aģentu lietotāju grupas ID</span>
+<span class="cm">// -------------------------------------------------------------------</span>
+
+$app = JFactory::getApplication(<span class="st">'site'</span>);
+$app-&gt;initialise();
+
+$user = JFactory::getUser();
+
+<span class="cm">// Nav pieteicies → parastā Joomla login forma, pēc tam atpakaļ šurp.</span>
+if ($user-&gt;guest) {
+    $return = base64_encode(JUri::getInstance()-&gt;toString());
+    $app-&gt;redirect(
+        JRoute::_(<span class="st">'index.php?option=com_users&amp;view=login&amp;return='</span> . $return, false)
+    );
+}
+
+<span class="cm">// Pieteicies, bet nav aģentu grupā → atpakaļ uz sākumlapu.</span>
+if (!in_array($groupId, $user-&gt;getAuthorisedGroups())) {
+    $app-&gt;enqueueMessage(<span class="st">'Jums nav piekļuves anketas rīkam.'</span>, <span class="st">'error'</span>);
+    $app-&gt;redirect(JRoute::_(<span class="st">'index.php'</span>, false));
+}
+
+<span class="cm">// Viss kārtībā → izsniedz marķieri, derīgu 60 sekundes.</span>
+$payload = json_encode([
+    <span class="st">'sub'</span>   =&gt; (int) $user-&gt;id,
+    <span class="st">'name'</span>  =&gt; $user-&gt;name,
+    <span class="st">'email'</span> =&gt; $user-&gt;email,
+    <span class="st">'iat'</span>   =&gt; time(),
+    <span class="st">'exp'</span>   =&gt; time() + 60,
+    <span class="st">'jti'</span>   =&gt; bin2hex(random_bytes(16)),
+], JSON_UNESCAPED_UNICODE);
+
+$body  = rtrim(strtr(base64_encode($payload), <span class="st">'+/'</span>, <span class="st">'-_'</span>), <span class="st">'='</span>);
+$sig   = hash_hmac(<span class="st">'sha256'</span>, $body, $secret);
+
+$app-&gt;redirect($appUrl . <span class="st">'/api/auth/joomla?token='</span> . urlencode($body . <span class="st">'.'</span> . $sig));</code></pre>
+          <p>
+            Marķieris ir <code>base64url(JSON) + "." + HMAC-SHA256</code>. Mūsu pusē tas tiek
+            pārbaudīts ar <code>hash_equals</code>, tiek pārbaudīts <code>exp</code>, un
+            <code>jti</code> tiek iegaumēts, lai vienu marķieri nevarētu izmantot divreiz.
+          </p>
+          <div class="note">
+            <p><strong>Nepieciešams PHP 7.0+</strong> — <code>random_bytes()</code> dēļ. Joomla 3.10
+            to prasa jebkurā gadījumā. Ja uz servera ir vecāks PHP, dodiet ziņu — nomainīsim uz
+            citu nejaušības avotu.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="stepblock">
+        <div class="stepbody">
+          <h2>Izvēlnes elements</h2>
+          <p>
+            Joomla admin → <em>Izvēlne → Jauns elements</em> → tips <em>Ārēja URL</em>:
+          </p>
+          <pre><code>URL:              https://ekocentrs.lv/kyc-sso.php
+Piekļuves līmenis: Special (vai jūsu aģentu līmenis)</code></pre>
+          <p>
+            Saite ved uz tiltu, nevis tieši uz anketu — tā aģents vienmēr iziet caur Joomla
+            pārbaudi. Piekļuves līmenis tikai paslēpj saiti no citiem; īsto pārbaudi veic
+            <code>kyc-sso.php</code>.
+          </p>
+          <div class="note">
+            <p><strong>Bez iframe.</strong> Aģenta lapa nedrīkst tikt iebūvēta rakstā kā
+            <code>&lt;iframe&gt;</code>: sesijas sīkdatne citā domēnā tiek uzskatīta par trešās
+            puses sīkdatni, un daļa pārlūku to bloķē. Klienta anketu (<code>/aizpildit</code>)
+            iframe-ā ielikt drīkst — tai autorizācija nav vajadzīga.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="stepblock">
+        <div class="stepbody">
+          <h2>Koplietotais noslēpums</h2>
+          <p>Ģenerējiet uz servera 32 baitu nejaušu virkni:</p>
+          <pre><code>openssl rand -hex 32</code></pre>
+          <p>
+            To pašu vērtību ieraksta <code>kyc-sso.php</code> un nodod mums — mēs to ieliekam
+            lietotnes vidē kā <code>JOOMLA_SSO_SECRET</code>. Lūdzam nodot to caur paroļu pārvaldnieku
+            vai citu drošu kanālu, nevis e-pastā vai čatā. Ja noslēpums kādreiz nonāk nepareizās rokās —
+            ģenerējiet jaunu, nomainiet abās vietās, un vecie marķieri uzreiz pārstāj darboties.
+          </p>
+        </div>
+      </div>
+
+      <div class="stepblock">
+        <div class="stepbody">
+          <h2>Pārbaude</h2>
+          <ul>
+            <li>Nepieteicies lietotājs atver izvēlnes saiti → redz Joomla login formu, pēc pieteikšanās nonāk anketā.</li>
+            <li>Pieteicies lietotājs <em>ārpus</em> aģentu grupas → tiek aizvests atpakaļ ar kļūdas paziņojumu.</li>
+            <li>Aģents atver <code>anketa.ekocentrs.lv/izveidot</code> tieši, bez sesijas → tiek pāradresēts uz Joomla.</li>
+            <li>Vienas un tās pašas marķiera saites atvēršana otrreiz → tiek noraidīta.</li>
+            <li>Klienta saite <code>/aizpildit?d=…</code> atveras anonīmi, arī citā pārlūkā un telefonā.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Ko mums vajag no jums</h2>
+    <ul class="checklist">
+      <li>Kurš variants — Vercel (A) vai jūsu serveris (B)?</li>
+      <li>Aģentu Joomla lietotāju grupas nosaukums un ID.</li>
+      <li>Koplietotais noslēpums (5. solis), nodots drošā kanālā.</li>
+      <li>PHP versija uz servera.</li>
+      <li>Apstiprinājums, ka subdomain <code>anketa.ekocentrs.lv</code> ir izveidots.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Piezīme par Joomla 3.10</h2>
+    <p>
+      Joomla 3.10 atbalsts beidzās 2023. gada augustā — vietne vairs nesaņem drošības
+      atjauninājumus. Uz anketu tas neattiecas: tā ir atsevišķa lietotne uz sava subdomain ar savu
+      koda bāzi. Taču tilts no 3. soļa ir rakstīts Joomla 3 API (<code>JFactory</code>,
+      <code>JRoute</code>), un pēc migrācijas uz Joomla 4/5 tas būs jāpārraksta uz
+      <code>Joomla\CMS\Factory</code>. Ja migrācija ir plānota tuvākajā laikā, ir vērts vispirms
+      migrēt un tikai tad likt tiltu — tā šo darbu nevajadzēs darīt divreiz.
+    </p>
+  </section>
+
+  <footer>
+    <div>Ekocentrs Web Solutions · AML/KYC anketa</div>
+    <div>Jautājumi par lietotnes pusi — rakstiet mums; Joomla puses kods šajā dokumentā ir gatavs kopēšanai.</div>
+  </footer>
+
+</div>
