@@ -427,19 +427,10 @@
           <h2>Lietotnes izvietošana jūsu serverī</h2>
           <p>Kas nepieciešams: Node.js 20+, git un aptuveni 1&nbsp;GB brīvas RAM (sk. piezīmi zemāk).</p>
           <p>
-            Pirmkods ir privātā Git repozitorijā. Ērtākais veids, kā to dabūt uz servera —
-            uz paša servera uzģenerējiet atslēgu un atsūtiet mums <strong>publisko</strong> daļu
-            (<code>.pub</code> faila saturs, to var sūtīt parastā e-pastā):
+            Pirmkods ir atvērtā repozitorijā — nekādas piekļuves atslēgas nav vajadzīgas, varat
+            sākt uzreiz:
           </p>
-          <pre><code>ssh-keygen -t ed25519 -C "anketa-deploy" -f ~/.ssh/anketa_deploy
-cat ~/.ssh/anketa_deploy.pub</code></pre>
-          <p>
-            Mēs to pievienosim repozitorijam kā <em>deploy key</em> tikai lasīšanai — tālāk
-            <code>git clone</code> un vēlāk <code>git pull</code> atjauninājumiem. Privātā atslēga
-            nekad neatstāj jūsu serveri. Ja jums ērtāk vienkārši arhīvs — pasakiet, atsūtīsim.
-          </p>
-          <p>Kad būsim atslēgu pievienojuši, atrakstīsim, un kodu var paņemt:</p>
-          <pre><code>git clone git@github.com:VladislavSolims/ekocentrs-web-solutions.git anketa
+          <pre><code>git clone https://github.com/VladislavSolims/ekocentrs-web-solutions.git anketa
 cd anketa
 <span class="cm"># vēlāk atjauninājumiem pietiek ar:</span>
 git pull</code></pre>
@@ -565,9 +556,8 @@ Piekļuves līmenis: Special (vai jūsu aģentu līmenis)</code></pre>
 
   <section>
     <h2>Kad esat pabeidzis</h2>
-    <p>Mums vajag trīs lietas:</p>
+    <p>Mums pietiek ar divām lietām:</p>
     <ul>
-      <li>publiskā deploy atslēga no 1. soļa (vai ziņa, ka vēlaties arhīvu);</li>
       <li>apstiprinājums, ka <code>anketa.ekocentrs.lv</code> ir izveidots un norāda uz pareizo vietu;</li>
       <li>īss apraksts, kā tieši <code>/izveidot</code> ir aizsargāts — lai mēs zinātu, ko teikt
         aģentam, kad viņš pirmoreiz mēģinās ieiet.</li>
@@ -690,19 +680,10 @@ Piekļuves līmenis: Special (vai jūsu aģentu līmenis)</code></pre>
           <h2>Размещение приложения на вашем сервере</h2>
           <p>Что нужно: Node.js 20+, git и около 1&nbsp;ГБ свободной памяти (см. примечание ниже).</p>
           <p>
-            Исходный код лежит в приватном Git-репозитории. Самый удобный способ получить его на
-            сервер — сгенерировать ключ прямо на сервере и прислать нам <strong>публичную</strong>
-            часть (содержимое файла <code>.pub</code>, её можно слать обычной почтой):
+            Исходный код лежит в открытом репозитории — никаких ключей доступа не нужно,
+            можно начинать сразу:
           </p>
-          <pre><code>ssh-keygen -t ed25519 -C "anketa-deploy" -f ~/.ssh/anketa_deploy
-cat ~/.ssh/anketa_deploy.pub</code></pre>
-          <p>
-            Мы добавим её к репозиторию как <em>deploy key</em> только на чтение — дальше
-            <code>git clone</code>, а для обновлений <code>git pull</code>. Приватный ключ при
-            этом никогда не покидает ваш сервер. Если удобнее просто архив — скажите, пришлём.
-          </p>
-          <p>Как только добавим ключ, мы вам ответим, и код забирается так:</p>
-          <pre><code>git clone git@github.com:VladislavSolims/ekocentrs-web-solutions.git anketa
+          <pre><code>git clone https://github.com/VladislavSolims/ekocentrs-web-solutions.git anketa
 cd anketa
 <span class="cm"># в дальнейшем для обновлений достаточно:</span>
 git pull</code></pre>
@@ -828,9 +809,8 @@ WantedBy=multi-user.target</code></pre>
 
   <section>
     <h2>Когда закончите</h2>
-    <p>Нам нужны три вещи:</p>
+    <p>Нам достаточно двух вещей:</p>
     <ul>
-      <li>публичный deploy-ключ из шага 1 (или сообщение, что предпочитаете архив);</li>
       <li>подтверждение, что <code>anketa.ekocentrs.lv</code> создан и указывает куда нужно;</li>
       <li>короткое описание, чем именно защищён <code>/izveidot</code> — чтобы мы знали, что
         сказать агенту, когда он в первый раз попробует зайти.</li>
@@ -953,19 +933,10 @@ WantedBy=multi-user.target</code></pre>
           <h2>Deploying the application on your server</h2>
           <p>What it needs: Node.js 20+, git, and around 1&nbsp;GB of free RAM (see the note below).</p>
           <p>
-            The source lives in a private Git repository. The easiest way to get it onto the
-            server is to generate a key on the server itself and send us the <strong>public</strong>
-            half (the contents of the <code>.pub</code> file — safe to send by ordinary email):
+            The source is in an open repository — no access keys needed, you can start straight
+            away:
           </p>
-          <pre><code>ssh-keygen -t ed25519 -C "anketa-deploy" -f ~/.ssh/anketa_deploy
-cat ~/.ssh/anketa_deploy.pub</code></pre>
-          <p>
-            We will add it to the repository as a read-only <em>deploy key</em> — then
-            <code>git clone</code>, and <code>git pull</code> for later updates. The private key
-            never leaves your server. If an archive is simpler for you, just say so.
-          </p>
-          <p>Once we have added the key we will write back, and the code is fetched with:</p>
-          <pre><code>git clone git@github.com:VladislavSolims/ekocentrs-web-solutions.git anketa
+          <pre><code>git clone https://github.com/VladislavSolims/ekocentrs-web-solutions.git anketa
 cd anketa
 <span class="cm"># later updates need only:</span>
 git pull</code></pre>
@@ -1092,9 +1063,8 @@ Access level:  Special (or your agents' level)</code></pre>
 
   <section>
     <h2>When you are done</h2>
-    <p>Three things from you:</p>
+    <p>Two things are enough for us:</p>
     <ul>
-      <li>the public deploy key from step 1 (or a note that you would rather have an archive);</li>
       <li>confirmation that <code>anketa.ekocentrs.lv</code> exists and points where it should;</li>
       <li>a short note on how exactly <code>/izveidot</code> is protected — so we know what to tell
         an agent the first time they try to get in.</li>
